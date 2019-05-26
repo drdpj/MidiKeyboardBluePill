@@ -18,13 +18,13 @@
 
 #include"main.h"
 
-/**
- * Ring buffer struct
- */
+ /**
+  * Ring buffer struct
+  */
 
 struct rb {
-	volatile uint8_t data[128];
-	volatile uint8_t readIndex;
-	volatile uint8_t writeIndex;
+    volatile uint8_t data[128];
+    volatile uint8_t readIndex;
+    volatile uint8_t writeIndex;
 };
 

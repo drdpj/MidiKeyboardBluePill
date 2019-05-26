@@ -17,33 +17,33 @@
   *                        opensource.org/licenses/BSD-3-Clause
   *
   *  USER CODE segments
- *  Copyright (C) 2019  Daniel Jameson
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- ******************************************************************************
- * Pins used: Userport PB0-7 (even pins 6-20) are on GPIOs PB6-13
- * Userport CB1 (pin 2) -> Clk, GPIO PB3
- * Userport CB2 (pin 4) -> MOSI, GPIO PB5
- * MIDI serial in (3.3V) -> GPIO PA3
- *
- *
+  *  Copyright (C) 2019  Daniel Jameson
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation, either version 3 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *  GNU General Public License for more details.
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  *
+  ******************************************************************************
+  * Pins used: Userport PB0-7 (even pins 6-20) are on GPIOs PB6-13
+  * Userport CB1 (pin 2) -> Clk, GPIO PB3
+  * Userport CB2 (pin 4) -> MOSI, GPIO PB5
+  * MIDI serial in (3.3V) -> GPIO PA3
+  *
+  *
  */
-  
-/* USER CODE END Header */
 
-/* Includes ------------------------------------------------------------------*/
+ /* USER CODE END Header */
+
+ /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -102,11 +102,11 @@ volatile struct rb ringBuffer;
 
 /* midi command struct */
 struct mc {
-	volatile uint8_t status;
-	volatile uint8_t data[2];
-	volatile uint8_t dataSize;
-	volatile uint8_t dataCounter;
-	volatile uint8_t complete;
+    volatile uint8_t status;
+    volatile uint8_t data[2];
+    volatile uint8_t dataSize;
+    volatile uint8_t dataCounter;
+    volatile uint8_t complete;
 };
 
 volatile struct mc midiCommand;
@@ -135,168 +135,168 @@ inline uint8_t ReadRingBuffer(void);
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-	uint8_t midiByte = 0;
-	uint8_t i = 0;
+    /* USER CODE BEGIN 1 */
+    uint8_t midiByte = 0;
+    uint8_t i = 0;
 
-	/* all keys high to start with */
-	for (i = 0; i < 8; i++) {
-		keyboardMatrix[i] = 255;
-	}
+    /* all keys high to start with */
+    for (i = 0; i < 8; i++) {
+        keyboardMatrix[i] = 255;
+    }
 
-	/* zero some things */
-	ringBuffer.readIndex = 0;
-	ringBuffer.writeIndex = 0;
-	midiCommand.complete = 0;
-	midiCommand.dataCounter = 0;
-	midiCommand.dataSize = 2;
-  /* USER CODE END 1 */
-  
+    /* zero some things */
+    ringBuffer.readIndex = 0;
+    ringBuffer.writeIndex = 0;
+    midiCommand.complete = 0;
+    midiCommand.dataCounter = 0;
+    midiCommand.dataSize = 2;
+    /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    /* MCU Configuration--------------------------------------------------------*/
 
-  /* USER CODE BEGIN Init */
+    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+    HAL_Init();
 
-  /* USER CODE END Init */
+    /* USER CODE BEGIN Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+    /* USER CODE END Init */
 
-  /* USER CODE BEGIN SysInit */
+    /* Configure the system clock */
+    SystemClock_Config();
 
-  /* USER CODE END SysInit */
+    /* USER CODE BEGIN SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_SPI1_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
+    /* USER CODE END SysInit */
 
-  /* enable the SPI and UART - not using the HAL read functions so need to turn them on */
-  __HAL_SPI_ENABLE(&hspi1);
-  __HAL_UART_ENABLE(&huart2);
-  
-  /* USER CODE END 2 */
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    MX_SPI1_Init();
+    MX_USART2_UART_Init();
+    /* USER CODE BEGIN 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+    /* enable the SPI and UART - not using the HAL read functions so need to turn them on */
+    __HAL_SPI_ENABLE(&hspi1);
+    __HAL_UART_ENABLE(&huart2);
 
-    /* USER CODE BEGIN 3 */
-	  /**
-		 * Zones 1-7 have notes, zone 8 has the control pedal
-		 * middle C is 1st note of zone 4 (int 127, midi 60)
-		 */
+    /* USER CODE END 2 */
 
-		 /* get a midi command from the ring buffer */
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1)
+    {
+        /* USER CODE END WHILE */
 
-	  while (midiCommand.complete == 0)
-	  {
-		  if (ringBuffer.readIndex != ringBuffer.writeIndex)
-		  {
-			  /* only if there's a byte available */
-			  midiByte = ReadRingBuffer();
-			  if (midiByte > 127)
-			  {
-				  /* a status byte */
-				  switch (midiByte & MIDI_MASK) {
-				  case MIDI_ON:
-					  midiCommand.status = MIDI_ON;
-					  midiCommand.dataSize = 2;
-					  midiCommand.dataCounter = 0;
-					  break;
-				  case MIDI_OFF:
-					  midiCommand.status = MIDI_OFF;
-					  midiCommand.dataSize = 2;
-					  midiCommand.dataCounter = 0;
-					  break;
-				  case MIDI_CONT:
-					  midiCommand.status = MIDI_CONT;
-					  midiCommand.dataSize = 2;
-					  midiCommand.dataCounter = 0;
-					  break;
-				  case MIDI_PROG:
-					  midiCommand.status = MIDI_PROG;
-					  midiCommand.dataSize = 1;
-					  midiCommand.dataCounter = 0;
-					  break;
-				  case MIDI_PRES:
-					  midiCommand.status = MIDI_PROG;
-					  midiCommand.dataSize = 1;
-					  midiCommand.dataCounter = 0;
-					  break;
-				  default:
-					  midiCommand.status = MIDI_IGNORE;
-					  midiCommand.dataSize = 2;
-					  midiCommand.dataCounter = 0;
-				  }
-			  }
-			  else {
-				  /* a data byte */
-				  midiCommand.data[midiCommand.dataCounter] = midiByte;
-				  midiCommand.dataCounter++;
-			  }
-			  if (midiCommand.dataCounter >= midiCommand.dataSize)
-				  /* now have a complete command */
-			  {
-				  midiCommand.complete = 1;
-			  }
+        /* USER CODE BEGIN 3 */
+        /**
+           * Zones 1-7 have notes, zone 8 has the control pedal
+           * middle C is 1st note of zone 4 (int 127, midi 60)
+           */
 
-		  }
-	  }
+           /* get a midi command from the ring buffer */
 
-	  /* Process the midi command */
-	  if (midiCommand.complete == 1) {
-		  switch (midiCommand.status)
-		  {
-		  case MIDI_ON:
+        while (midiCommand.complete == 0)
+        {
+            if (ringBuffer.readIndex != ringBuffer.writeIndex)
+            {
+                /* only if there's a byte available */
+                midiByte = ReadRingBuffer();
+                if (midiByte > 127)
+                {
+                    /* a status byte */
+                    switch (midiByte & MIDI_MASK) {
+                    case MIDI_ON:
+                        midiCommand.status = MIDI_ON;
+                        midiCommand.dataSize = 2;
+                        midiCommand.dataCounter = 0;
+                        break;
+                    case MIDI_OFF:
+                        midiCommand.status = MIDI_OFF;
+                        midiCommand.dataSize = 2;
+                        midiCommand.dataCounter = 0;
+                        break;
+                    case MIDI_CONT:
+                        midiCommand.status = MIDI_CONT;
+                        midiCommand.dataSize = 2;
+                        midiCommand.dataCounter = 0;
+                        break;
+                    case MIDI_PROG:
+                        midiCommand.status = MIDI_PROG;
+                        midiCommand.dataSize = 1;
+                        midiCommand.dataCounter = 0;
+                        break;
+                    case MIDI_PRES:
+                        midiCommand.status = MIDI_PROG;
+                        midiCommand.dataSize = 1;
+                        midiCommand.dataCounter = 0;
+                        break;
+                    default:
+                        midiCommand.status = MIDI_IGNORE;
+                        midiCommand.dataSize = 2;
+                        midiCommand.dataCounter = 0;
+                    }
+                }
+                else {
+                    /* a data byte */
+                    midiCommand.data[midiCommand.dataCounter] = midiByte;
+                    midiCommand.dataCounter++;
+                }
+                if (midiCommand.dataCounter >= midiCommand.dataSize)
+                    /* now have a complete command */
+                {
+                    midiCommand.complete = 1;
+                }
 
-			  if (midiCommand.data[1] != 0) {
-				  /* If there's a velocity in the second data byte, it's an on. */
-				  Note_On(midiCommand.data[0]);
-			  }
-			  else {
-				  /* No velocity in the second data byte is an off. */
-				  Note_Off(midiCommand.data[0]);
-			  }
-			  break;
-		  case MIDI_OFF:
-			  Note_Off(midiCommand.data[0]);
-			  break;
-		  case MIDI_CONT:
-			  if (midiCommand.data[0] == MIDI_PED) {
-				  /* This catches the sustain pedal MIDI command */
-				  if (midiCommand.data[1] < 64) {
-					  /**
-					   * Turn it on
-					   */
-					  keyboardMatrix[PEDAL_ZONE] |= (1 << 6);
-				  }
-				  else {
-					  /**
-					   * Turn it off
-					   */
+            }
+        }
 
-					  keyboardMatrix[PEDAL_ZONE] &= ~(1 << 6);
-				  }
-			  }
-			  break;
-		  default:
-			  /* If it's not a command we care about, do nothing! */
-			  break;
-		  }
-		  /*reset the command */
-		  midiCommand.complete = 0;
-		  midiCommand.dataCounter = 0;
-	  }
-  }
-  
-  /* USER CODE END 3 */
+        /* Process the midi command */
+        if (midiCommand.complete == 1) {
+            switch (midiCommand.status)
+            {
+            case MIDI_ON:
+
+                if (midiCommand.data[1] != 0) {
+                    /* If there's a velocity in the second data byte, it's an on. */
+                    Note_On(midiCommand.data[0]);
+                }
+                else {
+                    /* No velocity in the second data byte is an off. */
+                    Note_Off(midiCommand.data[0]);
+                }
+                break;
+            case MIDI_OFF:
+                Note_Off(midiCommand.data[0]);
+                break;
+            case MIDI_CONT:
+                if (midiCommand.data[0] == MIDI_PED) {
+                    /* This catches the sustain pedal MIDI command */
+                    if (midiCommand.data[1] < 64) {
+                        /**
+                         * Turn it on
+                         */
+                        keyboardMatrix[PEDAL_ZONE] |= (1 << 6);
+                    }
+                    else {
+                        /**
+                         * Turn it off
+                         */
+
+                        keyboardMatrix[PEDAL_ZONE] &= ~(1 << 6);
+                    }
+                }
+                break;
+            default:
+                /* If it's not a command we care about, do nothing! */
+                break;
+            }
+            /*reset the command */
+            midiCommand.complete = 0;
+            midiCommand.dataCounter = 0;
+        }
+    }
+
+    /* USER CODE END 3 */
 }
 
 /**
@@ -305,35 +305,35 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+        | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+    {
+        Error_Handler();
+    }
 }
 
 /**
@@ -344,33 +344,33 @@ void SystemClock_Config(void)
 static void MX_SPI1_Init(void)
 {
 
-  /* USER CODE BEGIN SPI1_Init 0 */
+    /* USER CODE BEGIN SPI1_Init 0 */
 
-  /* USER CODE END SPI1_Init 0 */
+    /* USER CODE END SPI1_Init 0 */
 
-  /* USER CODE BEGIN SPI1_Init 1 */
+    /* USER CODE BEGIN SPI1_Init 1 */
 
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_SLAVE;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-  hspi1.Instance->CR2 |= SPI_CR2_RXNEIE;
-  /* USER CODE END SPI1_Init 2 */
+    /* USER CODE END SPI1_Init 1 */
+    /* SPI1 parameter configuration*/
+    hspi1.Instance = SPI1;
+    hspi1.Init.Mode = SPI_MODE_SLAVE;
+    hspi1.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
+    hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    hspi1.Init.NSS = SPI_NSS_SOFT;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+    hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi1.Init.CRCPolynomial = 10;
+    if (HAL_SPI_Init(&hspi1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN SPI1_Init 2 */
+    hspi1.Instance->CR2 |= SPI_CR2_RXNEIE;
+    /* USER CODE END SPI1_Init 2 */
 
 }
 
@@ -382,29 +382,29 @@ static void MX_SPI1_Init(void)
 static void MX_USART2_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART2_Init 0 */
+    /* USER CODE BEGIN USART2_Init 0 */
 
-  /* USER CODE END USART2_Init 0 */
+    /* USER CODE END USART2_Init 0 */
 
-  /* USER CODE BEGIN USART2_Init 1 */
+    /* USER CODE BEGIN USART2_Init 1 */
 
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 31250;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-  huart2.Instance->CR1 |= USART_CR1_RXNEIE;
+    /* USER CODE END USART2_Init 1 */
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = 31250;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    if (HAL_UART_Init(&huart2) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN USART2_Init 2 */
+    huart2.Instance->CR1 |= USART_CR1_RXNEIE;
 
-  /* USER CODE END USART2_Init 2 */
+    /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -415,25 +415,25 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
-                          |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin, GPIO_PIN_SET);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOB, PB4_Pin | PB5_Pin | PB6_Pin | PB7_Pin
+        | PB0_Pin | PB1_Pin | PB2_Pin | PB3_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : PB4_Pin PB5_Pin PB6_Pin PB7_Pin 
-                           PB0_Pin PB1_Pin PB2_Pin PB3_Pin */
-  GPIO_InitStruct.Pin = PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
-                          |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /*Configure GPIO pins : PB4_Pin PB5_Pin PB6_Pin PB7_Pin
+                             PB0_Pin PB1_Pin PB2_Pin PB3_Pin */
+    GPIO_InitStruct.Pin = PB4_Pin | PB5_Pin | PB6_Pin | PB7_Pin
+        | PB0_Pin | PB1_Pin | PB2_Pin | PB3_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -451,19 +451,19 @@ static void MX_GPIO_Init(void)
 inline void Note_On(uint8_t note)
 {
 
-	/**
-	 * possibly long winded, but!
-	 * Bounds check the note, calculate which zone it's in,
-	 * Invert the zone for the keyboard matrix and then
-	 * flip the relevant bit.
-	 */
+    /**
+     * possibly long winded, but!
+     * Bounds check the note, calculate which zone it's in,
+     * Invert the zone for the keyboard matrix and then
+     * flip the relevant bit.
+     */
 
-	if ((note > 35) && (note < 85)) {
-		rawZone = ((note - 36) / 8);
-		m4kZone = 7 - rawZone;
-		m4kNote = note - 36 - (8 * rawZone);
-		keyboardMatrix[m4kZone] &= ~(1 << m4kNote);
-	}
+    if ((note > 35) && (note < 85)) {
+        rawZone = ((note - 36) / 8);
+        m4kZone = 7 - rawZone;
+        m4kNote = note - 36 - (8 * rawZone);
+        keyboardMatrix[m4kZone] &= ~(1 << m4kNote);
+    }
 }
 
 /**
@@ -474,23 +474,24 @@ inline void Note_On(uint8_t note)
 
 inline void Note_Off(uint8_t note)
 {
-	if ((note > 35) && (note < 85)) {
-		rawZone = ((note - 36) / 8);
-		m4kZone = 7 - rawZone;
-		m4kNote = note - 36 - (8 * rawZone);
-		keyboardMatrix[m4kZone] |= (1 << m4kNote);
-	}
+    if ((note > 35) && (note < 85)) {
+        rawZone = ((note - 36) / 8);
+        m4kZone = 7 - rawZone;
+        m4kNote = note - 36 - (8 * rawZone);
+
+        keyboardMatrix[m4kZone] |= (1 << m4kNote);
+    }
 }
 
 inline uint8_t ReadRingBuffer(void)
 {
-	/* Return a byte from the ringbuffer at the current
-	 * readIndex. 
-	 */
-	tempInt = ringBuffer.readIndex;
-	ringBuffer.readIndex++;
-	ringBuffer.readIndex &= 127;
-	return ringBuffer.data[tempInt];
+    /* Return a byte from the ringbuffer at the current
+     * readIndex.
+     */
+    tempInt = ringBuffer.readIndex;
+    ringBuffer.readIndex++;
+    ringBuffer.readIndex &= 127;
+    return ringBuffer.data[tempInt];
 }
 
 /* USER CODE END 4 */
@@ -501,10 +502,10 @@ inline uint8_t ReadRingBuffer(void)
   */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
 
-  /* USER CODE END Error_Handler_Debug */
+    /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -516,11 +517,11 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+{
+    /* USER CODE BEGIN 6 */
+    /* User can add his own implementation to report the file name and line number,
+       tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+       /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 
