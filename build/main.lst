@@ -1,0 +1,1556 @@
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"main.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.MX_GPIO_Init,"ax",%progbits
+  16              		.align	1
+  17              		.syntax unified
+  18              		.thumb
+  19              		.thumb_func
+  20              		.fpu softvfp
+  22              	MX_GPIO_Init:
+  23              	.LFB68:
+  24              		.file 1 "Src/main.c"
+   1:Src/main.c    **** /* USER CODE BEGIN Header */
+   2:Src/main.c    **** /**
+   3:Src/main.c    ****   * MIDI to Hybrid Music 4000 Converter
+   4:Src/main.c    ****   *
+   5:Src/main.c    ****   ******************************************************************************
+   6:Src/main.c    ****   * @file           : main.c
+   7:Src/main.c    ****   * @brief          : Main program body
+   8:Src/main.c    ****   ******************************************************************************
+   9:Src/main.c    ****   * @attention
+  10:Src/main.c    ****   *
+  11:Src/main.c    ****   * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  12:Src/main.c    ****   * All rights reserved.</center></h2>
+  13:Src/main.c    ****   *
+  14:Src/main.c    ****   * This software component is licensed by ST under BSD 3-Clause license,
+  15:Src/main.c    ****   * the "License"; You may not use this file except in compliance with the
+  16:Src/main.c    ****   * License. You may obtain a copy of the License at:
+  17:Src/main.c    ****   *                        opensource.org/licenses/BSD-3-Clause
+  18:Src/main.c    ****   *
+  19:Src/main.c    ****   *  USER CODE segments
+  20:Src/main.c    ****  *  Copyright (C) 2019  Daniel Jameson
+  21:Src/main.c    ****  *
+  22:Src/main.c    ****  *  This program is free software: you can redistribute it and/or modify
+  23:Src/main.c    ****  *  it under the terms of the GNU General Public License as published by
+  24:Src/main.c    ****  *  the Free Software Foundation, either version 3 of the License, or
+  25:Src/main.c    ****  *  (at your option) any later version.
+  26:Src/main.c    ****  *
+  27:Src/main.c    ****  *  This program is distributed in the hope that it will be useful,
+  28:Src/main.c    ****  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  29:Src/main.c    ****  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  30:Src/main.c    ****  *  GNU General Public License for more details.
+  31:Src/main.c    ****  *
+  32:Src/main.c    ****  *  You should have received a copy of the GNU General Public License
+  33:Src/main.c    ****  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  34:Src/main.c    ****  *
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 2
+
+
+  35:Src/main.c    ****  ******************************************************************************
+  36:Src/main.c    ****  * Pins used: Userport PB0-7 (even pins 6-20) are on GPIOs PB6-13
+  37:Src/main.c    ****  * Userport CB1 (pin 2) -> Clk, GPIO PB3
+  38:Src/main.c    ****  * Userport CB2 (pin 4) -> MOSI, GPIO PB5
+  39:Src/main.c    ****  * MIDI serial in (3.3V) -> GPIO PA3
+  40:Src/main.c    ****  *
+  41:Src/main.c    ****  *
+  42:Src/main.c    ****  */
+  43:Src/main.c    ****   
+  44:Src/main.c    **** /* USER CODE END Header */
+  45:Src/main.c    **** 
+  46:Src/main.c    **** /* Includes ------------------------------------------------------------------*/
+  47:Src/main.c    **** #include "main.h"
+  48:Src/main.c    **** 
+  49:Src/main.c    **** /* Private includes ----------------------------------------------------------*/
+  50:Src/main.c    **** /* USER CODE BEGIN Includes */
+  51:Src/main.c    **** #include "utilities.h"
+  52:Src/main.c    **** /* USER CODE END Includes */
+  53:Src/main.c    **** 
+  54:Src/main.c    **** /* Private typedef -----------------------------------------------------------*/
+  55:Src/main.c    **** /* USER CODE BEGIN PTD */
+  56:Src/main.c    **** 
+  57:Src/main.c    **** /* USER CODE END PTD */
+  58:Src/main.c    **** 
+  59:Src/main.c    **** /* Private define ------------------------------------------------------------*/
+  60:Src/main.c    **** /* USER CODE BEGIN PD */
+  61:Src/main.c    **** #define MIDI_MASK 0b11110000
+  62:Src/main.c    **** #define MIDI_ON 0b10010000
+  63:Src/main.c    **** #define MIDI_OFF 0b10000000
+  64:Src/main.c    **** #define MIDI_CONT 0b10110000
+  65:Src/main.c    **** #define MIDI_PRES 0b11010000
+  66:Src/main.c    **** #define MIDI_PROG 0b11000000
+  67:Src/main.c    **** #define MIDI_IGNORE 255
+  68:Src/main.c    **** #define MIDI_PED 64
+  69:Src/main.c    **** #define PEDAL_ZONE 0
+  70:Src/main.c    **** #define FALSE 0
+  71:Src/main.c    **** #define TRUE 1
+  72:Src/main.c    **** 
+  73:Src/main.c    **** /* USER CODE END PD */
+  74:Src/main.c    **** 
+  75:Src/main.c    **** /* Private macro -------------------------------------------------------------*/
+  76:Src/main.c    **** /* USER CODE BEGIN PM */
+  77:Src/main.c    **** 
+  78:Src/main.c    **** /* USER CODE END PM */
+  79:Src/main.c    **** 
+  80:Src/main.c    **** /* Private variables ---------------------------------------------------------*/
+  81:Src/main.c    **** SPI_HandleTypeDef hspi1;
+  82:Src/main.c    **** 
+  83:Src/main.c    **** UART_HandleTypeDef huart2;
+  84:Src/main.c    **** 
+  85:Src/main.c    **** /* USER CODE BEGIN PV */
+  86:Src/main.c    **** 
+  87:Src/main.c    **** /* This is the keyboard matrix */
+  88:Src/main.c    **** volatile uint8_t keyboardMatrix[8];
+  89:Src/main.c    **** 
+  90:Src/main.c    **** /* Some variables used to calculate the key */
+  91:Src/main.c    **** uint8_t m4kZone;
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 3
+
+
+  92:Src/main.c    **** uint8_t m4kNote;
+  93:Src/main.c    **** uint8_t rawZone;
+  94:Src/main.c    **** 
+  95:Src/main.c    **** /* A temporary integer - probably gets optimised out! */
+  96:Src/main.c    **** 
+  97:Src/main.c    **** uint8_t tempInt;
+  98:Src/main.c    **** 
+  99:Src/main.c    **** /* the ring buffer */
+ 100:Src/main.c    **** 
+ 101:Src/main.c    **** volatile struct rb ringBuffer;
+ 102:Src/main.c    **** 
+ 103:Src/main.c    **** /* midi command struct */
+ 104:Src/main.c    **** struct mc {
+ 105:Src/main.c    **** 	volatile uint8_t status;
+ 106:Src/main.c    **** 	volatile uint8_t data[2];
+ 107:Src/main.c    **** 	volatile uint8_t dataSize;
+ 108:Src/main.c    **** 	volatile uint8_t dataCounter;
+ 109:Src/main.c    **** 	volatile uint8_t complete;
+ 110:Src/main.c    **** };
+ 111:Src/main.c    **** 
+ 112:Src/main.c    **** volatile struct mc midiCommand;
+ 113:Src/main.c    **** 
+ 114:Src/main.c    **** /* USER CODE END PV */
+ 115:Src/main.c    **** 
+ 116:Src/main.c    **** /* Private function prototypes -----------------------------------------------*/
+ 117:Src/main.c    **** void SystemClock_Config(void);
+ 118:Src/main.c    **** static void MX_GPIO_Init(void);
+ 119:Src/main.c    **** static void MX_SPI1_Init(void);
+ 120:Src/main.c    **** static void MX_USART2_UART_Init(void);
+ 121:Src/main.c    **** /* USER CODE BEGIN PFP */
+ 122:Src/main.c    **** inline void Note_On(uint8_t);
+ 123:Src/main.c    **** inline void Note_Off(uint8_t);
+ 124:Src/main.c    **** inline uint8_t ReadRingBuffer(void);
+ 125:Src/main.c    **** /* USER CODE END PFP */
+ 126:Src/main.c    **** 
+ 127:Src/main.c    **** /* Private user code ---------------------------------------------------------*/
+ 128:Src/main.c    **** /* USER CODE BEGIN 0 */
+ 129:Src/main.c    **** 
+ 130:Src/main.c    **** /* USER CODE END 0 */
+ 131:Src/main.c    **** 
+ 132:Src/main.c    **** /**
+ 133:Src/main.c    ****   * @brief  The application entry point.
+ 134:Src/main.c    ****   * @retval int
+ 135:Src/main.c    ****   */
+ 136:Src/main.c    **** int main(void)
+ 137:Src/main.c    **** {
+ 138:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 139:Src/main.c    **** 	uint8_t midiByte = 0;
+ 140:Src/main.c    **** 	uint8_t i = 0;
+ 141:Src/main.c    **** 
+ 142:Src/main.c    **** 	/* all keys high to start with */
+ 143:Src/main.c    **** 	for (i = 0; i < 8; i++) {
+ 144:Src/main.c    **** 		keyboardMatrix[i] = 255;
+ 145:Src/main.c    **** 	}
+ 146:Src/main.c    **** 
+ 147:Src/main.c    **** 	/* zero some things */
+ 148:Src/main.c    **** 	ringBuffer.readIndex = 0;
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 4
+
+
+ 149:Src/main.c    **** 	ringBuffer.writeIndex = 0;
+ 150:Src/main.c    **** 	midiCommand.complete = 0;
+ 151:Src/main.c    **** 	midiCommand.dataCounter = 0;
+ 152:Src/main.c    **** 	midiCommand.dataSize = 2;
+ 153:Src/main.c    ****   /* USER CODE END 1 */
+ 154:Src/main.c    ****   
+ 155:Src/main.c    **** 
+ 156:Src/main.c    ****   /* MCU Configuration--------------------------------------------------------*/
+ 157:Src/main.c    **** 
+ 158:Src/main.c    ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ 159:Src/main.c    ****   HAL_Init();
+ 160:Src/main.c    **** 
+ 161:Src/main.c    ****   /* USER CODE BEGIN Init */
+ 162:Src/main.c    **** 
+ 163:Src/main.c    ****   /* USER CODE END Init */
+ 164:Src/main.c    **** 
+ 165:Src/main.c    ****   /* Configure the system clock */
+ 166:Src/main.c    ****   SystemClock_Config();
+ 167:Src/main.c    **** 
+ 168:Src/main.c    ****   /* USER CODE BEGIN SysInit */
+ 169:Src/main.c    **** 
+ 170:Src/main.c    ****   /* USER CODE END SysInit */
+ 171:Src/main.c    **** 
+ 172:Src/main.c    ****   /* Initialize all configured peripherals */
+ 173:Src/main.c    ****   MX_GPIO_Init();
+ 174:Src/main.c    ****   MX_SPI1_Init();
+ 175:Src/main.c    ****   MX_USART2_UART_Init();
+ 176:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 177:Src/main.c    **** 
+ 178:Src/main.c    ****   /* enable the SPI and UART - not using the HAL read functions so need to turn them on */
+ 179:Src/main.c    ****   __HAL_SPI_ENABLE(&hspi1);
+ 180:Src/main.c    ****   __HAL_UART_ENABLE(&huart2);
+ 181:Src/main.c    ****   
+ 182:Src/main.c    ****   /* USER CODE END 2 */
+ 183:Src/main.c    **** 
+ 184:Src/main.c    ****   /* Infinite loop */
+ 185:Src/main.c    ****   /* USER CODE BEGIN WHILE */
+ 186:Src/main.c    ****   while (1)
+ 187:Src/main.c    ****   {
+ 188:Src/main.c    ****     /* USER CODE END WHILE */
+ 189:Src/main.c    **** 
+ 190:Src/main.c    ****     /* USER CODE BEGIN 3 */
+ 191:Src/main.c    **** 	  /**
+ 192:Src/main.c    **** 		 * Zones 1-7 have notes, zone 8 has the control pedal
+ 193:Src/main.c    **** 		 * middle C is 1st note of zone 4 (int 127, midi 60)
+ 194:Src/main.c    **** 		 */
+ 195:Src/main.c    **** 
+ 196:Src/main.c    **** 		 /* get a midi command from the ring buffer */
+ 197:Src/main.c    **** 
+ 198:Src/main.c    **** 	  while (midiCommand.complete == 0)
+ 199:Src/main.c    **** 	  {
+ 200:Src/main.c    **** 		  if (ringBuffer.readIndex != ringBuffer.writeIndex)
+ 201:Src/main.c    **** 		  {
+ 202:Src/main.c    **** 			  /* only if there's a byte available */
+ 203:Src/main.c    **** 			  midiByte = ReadRingBuffer();
+ 204:Src/main.c    **** 			  if (midiByte > 127)
+ 205:Src/main.c    **** 			  {
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 5
+
+
+ 206:Src/main.c    **** 				  /* a status byte */
+ 207:Src/main.c    **** 				  switch (midiByte & MIDI_MASK) {
+ 208:Src/main.c    **** 				  case MIDI_ON:
+ 209:Src/main.c    **** 					  midiCommand.status = MIDI_ON;
+ 210:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 211:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 212:Src/main.c    **** 					  break;
+ 213:Src/main.c    **** 				  case MIDI_OFF:
+ 214:Src/main.c    **** 					  midiCommand.status = MIDI_OFF;
+ 215:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 216:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 217:Src/main.c    **** 					  break;
+ 218:Src/main.c    **** 				  case MIDI_CONT:
+ 219:Src/main.c    **** 					  midiCommand.status = MIDI_CONT;
+ 220:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 221:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 222:Src/main.c    **** 					  break;
+ 223:Src/main.c    **** 				  case MIDI_PROG:
+ 224:Src/main.c    **** 					  midiCommand.status = MIDI_PROG;
+ 225:Src/main.c    **** 					  midiCommand.dataSize = 1;
+ 226:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 227:Src/main.c    **** 					  break;
+ 228:Src/main.c    **** 				  case MIDI_PRES:
+ 229:Src/main.c    **** 					  midiCommand.status = MIDI_PROG;
+ 230:Src/main.c    **** 					  midiCommand.dataSize = 1;
+ 231:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 232:Src/main.c    **** 					  break;
+ 233:Src/main.c    **** 				  default:
+ 234:Src/main.c    **** 					  midiCommand.status = MIDI_IGNORE;
+ 235:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 236:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 237:Src/main.c    **** 				  }
+ 238:Src/main.c    **** 			  }
+ 239:Src/main.c    **** 			  else {
+ 240:Src/main.c    **** 				  /* a data byte */
+ 241:Src/main.c    **** 				  midiCommand.data[midiCommand.dataCounter] = midiByte;
+ 242:Src/main.c    **** 				  midiCommand.dataCounter++;
+ 243:Src/main.c    **** 			  }
+ 244:Src/main.c    **** 			  if (midiCommand.dataCounter >= midiCommand.dataSize)
+ 245:Src/main.c    **** 				  /* now have a complete command */
+ 246:Src/main.c    **** 			  {
+ 247:Src/main.c    **** 				  midiCommand.complete = 1;
+ 248:Src/main.c    **** 			  }
+ 249:Src/main.c    **** 
+ 250:Src/main.c    **** 		  }
+ 251:Src/main.c    **** 	  }
+ 252:Src/main.c    **** 
+ 253:Src/main.c    **** 	  /* Process the midi command */
+ 254:Src/main.c    **** 	  if (midiCommand.complete == 1) {
+ 255:Src/main.c    **** 		  switch (midiCommand.status)
+ 256:Src/main.c    **** 		  {
+ 257:Src/main.c    **** 		  case MIDI_ON:
+ 258:Src/main.c    **** 
+ 259:Src/main.c    **** 			  if (midiCommand.data[1] != 0) {
+ 260:Src/main.c    **** 				  /* If there's a velocity in the second data byte, it's an on. */
+ 261:Src/main.c    **** 				  Note_On(midiCommand.data[0]);
+ 262:Src/main.c    **** 			  }
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 6
+
+
+ 263:Src/main.c    **** 			  else {
+ 264:Src/main.c    **** 				  /* No velocity in the second data byte is an off. */
+ 265:Src/main.c    **** 				  Note_Off(midiCommand.data[0]);
+ 266:Src/main.c    **** 			  }
+ 267:Src/main.c    **** 			  break;
+ 268:Src/main.c    **** 		  case MIDI_OFF:
+ 269:Src/main.c    **** 			  Note_Off(midiCommand.data[0]);
+ 270:Src/main.c    **** 			  break;
+ 271:Src/main.c    **** 		  case MIDI_CONT:
+ 272:Src/main.c    **** 			  if (midiCommand.data[0] == MIDI_PED) {
+ 273:Src/main.c    **** 				  /* This catches the sustain pedal MIDI command */
+ 274:Src/main.c    **** 				  if (midiCommand.data[1] < 64) {
+ 275:Src/main.c    **** 					  /**
+ 276:Src/main.c    **** 					   * Turn it on
+ 277:Src/main.c    **** 					   */
+ 278:Src/main.c    **** 					  keyboardMatrix[PEDAL_ZONE] |= (1 << 6);
+ 279:Src/main.c    **** 				  }
+ 280:Src/main.c    **** 				  else {
+ 281:Src/main.c    **** 					  /**
+ 282:Src/main.c    **** 					   * Turn it off
+ 283:Src/main.c    **** 					   */
+ 284:Src/main.c    **** 
+ 285:Src/main.c    **** 					  keyboardMatrix[PEDAL_ZONE] &= ~(1 << 6);
+ 286:Src/main.c    **** 				  }
+ 287:Src/main.c    **** 			  }
+ 288:Src/main.c    **** 			  break;
+ 289:Src/main.c    **** 		  default:
+ 290:Src/main.c    **** 			  /* If it's not a command we care about, do nothing! */
+ 291:Src/main.c    **** 			  break;
+ 292:Src/main.c    **** 		  }
+ 293:Src/main.c    **** 		  /*reset the command */
+ 294:Src/main.c    **** 		  midiCommand.complete = 0;
+ 295:Src/main.c    **** 		  midiCommand.dataCounter = 0;
+ 296:Src/main.c    **** 	  }
+ 297:Src/main.c    ****   }
+ 298:Src/main.c    ****   
+ 299:Src/main.c    ****   /* USER CODE END 3 */
+ 300:Src/main.c    **** }
+ 301:Src/main.c    **** 
+ 302:Src/main.c    **** /**
+ 303:Src/main.c    ****   * @brief System Clock Configuration
+ 304:Src/main.c    ****   * @retval None
+ 305:Src/main.c    ****   */
+ 306:Src/main.c    **** void SystemClock_Config(void)
+ 307:Src/main.c    **** {
+ 308:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 309:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 310:Src/main.c    **** 
+ 311:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 312:Src/main.c    ****   */
+ 313:Src/main.c    ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+ 314:Src/main.c    ****   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+ 315:Src/main.c    ****   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+ 316:Src/main.c    ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 317:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 318:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+ 319:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 7
+
+
+ 320:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 321:Src/main.c    ****   {
+ 322:Src/main.c    ****     Error_Handler();
+ 323:Src/main.c    ****   }
+ 324:Src/main.c    ****   /** Initializes the CPU, AHB and APB busses clocks 
+ 325:Src/main.c    ****   */
+ 326:Src/main.c    ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 327:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 328:Src/main.c    ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+ 329:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 330:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 331:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 332:Src/main.c    **** 
+ 333:Src/main.c    ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+ 334:Src/main.c    ****   {
+ 335:Src/main.c    ****     Error_Handler();
+ 336:Src/main.c    ****   }
+ 337:Src/main.c    **** }
+ 338:Src/main.c    **** 
+ 339:Src/main.c    **** /**
+ 340:Src/main.c    ****   * @brief SPI1 Initialization Function
+ 341:Src/main.c    ****   * @param None
+ 342:Src/main.c    ****   * @retval None
+ 343:Src/main.c    ****   */
+ 344:Src/main.c    **** static void MX_SPI1_Init(void)
+ 345:Src/main.c    **** {
+ 346:Src/main.c    **** 
+ 347:Src/main.c    ****   /* USER CODE BEGIN SPI1_Init 0 */
+ 348:Src/main.c    **** 
+ 349:Src/main.c    ****   /* USER CODE END SPI1_Init 0 */
+ 350:Src/main.c    **** 
+ 351:Src/main.c    ****   /* USER CODE BEGIN SPI1_Init 1 */
+ 352:Src/main.c    **** 
+ 353:Src/main.c    ****   /* USER CODE END SPI1_Init 1 */
+ 354:Src/main.c    ****   /* SPI1 parameter configuration*/
+ 355:Src/main.c    ****   hspi1.Instance = SPI1;
+ 356:Src/main.c    ****   hspi1.Init.Mode = SPI_MODE_SLAVE;
+ 357:Src/main.c    ****   hspi1.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
+ 358:Src/main.c    ****   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+ 359:Src/main.c    ****   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+ 360:Src/main.c    ****   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+ 361:Src/main.c    ****   hspi1.Init.NSS = SPI_NSS_SOFT;
+ 362:Src/main.c    ****   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+ 363:Src/main.c    ****   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+ 364:Src/main.c    ****   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+ 365:Src/main.c    ****   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+ 366:Src/main.c    ****   hspi1.Init.CRCPolynomial = 10;
+ 367:Src/main.c    ****   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+ 368:Src/main.c    ****   {
+ 369:Src/main.c    ****     Error_Handler();
+ 370:Src/main.c    ****   }
+ 371:Src/main.c    ****   /* USER CODE BEGIN SPI1_Init 2 */
+ 372:Src/main.c    ****   hspi1.Instance->CR2 |= SPI_CR2_RXNEIE;
+ 373:Src/main.c    ****   /* USER CODE END SPI1_Init 2 */
+ 374:Src/main.c    **** 
+ 375:Src/main.c    **** }
+ 376:Src/main.c    **** 
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 8
+
+
+ 377:Src/main.c    **** /**
+ 378:Src/main.c    ****   * @brief USART2 Initialization Function
+ 379:Src/main.c    ****   * @param None
+ 380:Src/main.c    ****   * @retval None
+ 381:Src/main.c    ****   */
+ 382:Src/main.c    **** static void MX_USART2_UART_Init(void)
+ 383:Src/main.c    **** {
+ 384:Src/main.c    **** 
+ 385:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 0 */
+ 386:Src/main.c    **** 
+ 387:Src/main.c    ****   /* USER CODE END USART2_Init 0 */
+ 388:Src/main.c    **** 
+ 389:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 1 */
+ 390:Src/main.c    **** 
+ 391:Src/main.c    ****   /* USER CODE END USART2_Init 1 */
+ 392:Src/main.c    ****   huart2.Instance = USART2;
+ 393:Src/main.c    ****   huart2.Init.BaudRate = 31250;
+ 394:Src/main.c    ****   huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 395:Src/main.c    ****   huart2.Init.StopBits = UART_STOPBITS_1;
+ 396:Src/main.c    ****   huart2.Init.Parity = UART_PARITY_NONE;
+ 397:Src/main.c    ****   huart2.Init.Mode = UART_MODE_RX;
+ 398:Src/main.c    ****   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 399:Src/main.c    ****   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 400:Src/main.c    ****   if (HAL_UART_Init(&huart2) != HAL_OK)
+ 401:Src/main.c    ****   {
+ 402:Src/main.c    ****     Error_Handler();
+ 403:Src/main.c    ****   }
+ 404:Src/main.c    ****   /* USER CODE BEGIN USART2_Init 2 */
+ 405:Src/main.c    ****   huart2.Instance->CR1 |= USART_CR1_RXNEIE;
+ 406:Src/main.c    **** 
+ 407:Src/main.c    ****   /* USER CODE END USART2_Init 2 */
+ 408:Src/main.c    **** 
+ 409:Src/main.c    **** }
+ 410:Src/main.c    **** 
+ 411:Src/main.c    **** /**
+ 412:Src/main.c    ****   * @brief GPIO Initialization Function
+ 413:Src/main.c    ****   * @param None
+ 414:Src/main.c    ****   * @retval None
+ 415:Src/main.c    ****   */
+ 416:Src/main.c    **** static void MX_GPIO_Init(void)
+ 417:Src/main.c    **** {
+  25              		.loc 1 417 0
+  26              		.cfi_startproc
+  27              		@ args = 0, pretend = 0, frame = 32
+  28              		@ frame_needed = 0, uses_anonymous_args = 0
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  34 0002 88B0     		sub	sp, sp, #32
+  35              	.LCFI1:
+  36              		.cfi_def_cfa_offset 40
+ 418:Src/main.c    ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  37              		.loc 1 418 0
+  38 0004 0023     		movs	r3, #0
+  39 0006 0493     		str	r3, [sp, #16]
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 9
+
+
+  40 0008 0593     		str	r3, [sp, #20]
+  41 000a 0693     		str	r3, [sp, #24]
+  42 000c 0793     		str	r3, [sp, #28]
+  43              	.LBB10:
+ 419:Src/main.c    **** 
+ 420:Src/main.c    ****   /* GPIO Ports Clock Enable */
+ 421:Src/main.c    ****   __HAL_RCC_GPIOD_CLK_ENABLE();
+  44              		.loc 1 421 0
+  45 000e 03F18043 		add	r3, r3, #1073741824
+  46 0012 03F50433 		add	r3, r3, #135168
+  47 0016 9A69     		ldr	r2, [r3, #24]
+  48 0018 42F02002 		orr	r2, r2, #32
+  49 001c 9A61     		str	r2, [r3, #24]
+  50 001e 9A69     		ldr	r2, [r3, #24]
+  51 0020 02F02002 		and	r2, r2, #32
+  52 0024 0192     		str	r2, [sp, #4]
+  53 0026 019A     		ldr	r2, [sp, #4]
+  54              	.LBE10:
+  55              	.LBB11:
+ 422:Src/main.c    ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+  56              		.loc 1 422 0
+  57 0028 9A69     		ldr	r2, [r3, #24]
+  58 002a 42F00402 		orr	r2, r2, #4
+  59 002e 9A61     		str	r2, [r3, #24]
+  60 0030 9A69     		ldr	r2, [r3, #24]
+  61 0032 02F00402 		and	r2, r2, #4
+  62 0036 0292     		str	r2, [sp, #8]
+  63 0038 029A     		ldr	r2, [sp, #8]
+  64              	.LBE11:
+  65              	.LBB12:
+ 423:Src/main.c    ****   __HAL_RCC_GPIOB_CLK_ENABLE();
+  66              		.loc 1 423 0
+  67 003a 9A69     		ldr	r2, [r3, #24]
+  68 003c 42F00802 		orr	r2, r2, #8
+  69 0040 9A61     		str	r2, [r3, #24]
+  70 0042 9B69     		ldr	r3, [r3, #24]
+  71 0044 03F00803 		and	r3, r3, #8
+  72 0048 0393     		str	r3, [sp, #12]
+  73 004a 039B     		ldr	r3, [sp, #12]
+  74              	.LBE12:
+ 424:Src/main.c    **** 
+ 425:Src/main.c    ****   /*Configure GPIO pin Output Level */
+ 426:Src/main.c    ****   HAL_GPIO_WritePin(GPIOB, PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
+  75              		.loc 1 426 0
+  76 004c 0A4C     		ldr	r4, .L3
+  77 004e 0122     		movs	r2, #1
+  78 0050 4FF47F51 		mov	r1, #16320
+  79 0054 2046     		mov	r0, r4
+  80 0056 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  81              	.LVL0:
+ 427:Src/main.c    ****                           |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin, GPIO_PIN_SET);
+ 428:Src/main.c    **** 
+ 429:Src/main.c    ****   /*Configure GPIO pins : PB4_Pin PB5_Pin PB6_Pin PB7_Pin 
+ 430:Src/main.c    ****                            PB0_Pin PB1_Pin PB2_Pin PB3_Pin */
+ 431:Src/main.c    ****   GPIO_InitStruct.Pin = PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
+  82              		.loc 1 431 0
+  83 005a 4FF47F53 		mov	r3, #16320
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 10
+
+
+  84 005e 0493     		str	r3, [sp, #16]
+ 432:Src/main.c    ****                           |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin;
+ 433:Src/main.c    ****   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  85              		.loc 1 433 0
+  86 0060 1123     		movs	r3, #17
+  87 0062 0593     		str	r3, [sp, #20]
+ 434:Src/main.c    ****   GPIO_InitStruct.Pull = GPIO_PULLUP;
+  88              		.loc 1 434 0
+  89 0064 0123     		movs	r3, #1
+  90 0066 0693     		str	r3, [sp, #24]
+ 435:Src/main.c    ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  91              		.loc 1 435 0
+  92 0068 0323     		movs	r3, #3
+  93 006a 0793     		str	r3, [sp, #28]
+ 436:Src/main.c    ****   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  94              		.loc 1 436 0
+  95 006c 04A9     		add	r1, sp, #16
+  96 006e 2046     		mov	r0, r4
+  97 0070 FFF7FEFF 		bl	HAL_GPIO_Init
+  98              	.LVL1:
+ 437:Src/main.c    **** 
+ 438:Src/main.c    **** }
+  99              		.loc 1 438 0
+ 100 0074 08B0     		add	sp, sp, #32
+ 101              	.LCFI2:
+ 102              		.cfi_def_cfa_offset 8
+ 103              		@ sp needed
+ 104 0076 10BD     		pop	{r4, pc}
+ 105              	.L4:
+ 106              		.align	2
+ 107              	.L3:
+ 108 0078 000C0140 		.word	1073810432
+ 109              		.cfi_endproc
+ 110              	.LFE68:
+ 112              		.section	.text.MX_SPI1_Init,"ax",%progbits
+ 113              		.align	1
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 117              		.fpu softvfp
+ 119              	MX_SPI1_Init:
+ 120              	.LFB66:
+ 345:Src/main.c    **** 
+ 121              		.loc 1 345 0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 0
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+ 125 0000 10B5     		push	{r4, lr}
+ 126              	.LCFI3:
+ 127              		.cfi_def_cfa_offset 8
+ 128              		.cfi_offset 4, -8
+ 129              		.cfi_offset 14, -4
+ 355:Src/main.c    ****   hspi1.Init.Mode = SPI_MODE_SLAVE;
+ 130              		.loc 1 355 0
+ 131 0002 104C     		ldr	r4, .L7
+ 132 0004 104B     		ldr	r3, .L7+4
+ 133 0006 2360     		str	r3, [r4]
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 11
+
+
+ 356:Src/main.c    ****   hspi1.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
+ 134              		.loc 1 356 0
+ 135 0008 0023     		movs	r3, #0
+ 136 000a 6360     		str	r3, [r4, #4]
+ 357:Src/main.c    ****   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+ 137              		.loc 1 357 0
+ 138 000c 4FF48062 		mov	r2, #1024
+ 139 0010 A260     		str	r2, [r4, #8]
+ 358:Src/main.c    ****   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+ 140              		.loc 1 358 0
+ 141 0012 E360     		str	r3, [r4, #12]
+ 359:Src/main.c    ****   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+ 142              		.loc 1 359 0
+ 143 0014 0222     		movs	r2, #2
+ 144 0016 2261     		str	r2, [r4, #16]
+ 360:Src/main.c    ****   hspi1.Init.NSS = SPI_NSS_SOFT;
+ 145              		.loc 1 360 0
+ 146 0018 0122     		movs	r2, #1
+ 147 001a 6261     		str	r2, [r4, #20]
+ 361:Src/main.c    ****   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+ 148              		.loc 1 361 0
+ 149 001c 4FF40072 		mov	r2, #512
+ 150 0020 A261     		str	r2, [r4, #24]
+ 362:Src/main.c    ****   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+ 151              		.loc 1 362 0
+ 152 0022 0822     		movs	r2, #8
+ 153 0024 E261     		str	r2, [r4, #28]
+ 363:Src/main.c    ****   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+ 154              		.loc 1 363 0
+ 155 0026 2362     		str	r3, [r4, #32]
+ 364:Src/main.c    ****   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+ 156              		.loc 1 364 0
+ 157 0028 6362     		str	r3, [r4, #36]
+ 365:Src/main.c    ****   hspi1.Init.CRCPolynomial = 10;
+ 158              		.loc 1 365 0
+ 159 002a A362     		str	r3, [r4, #40]
+ 366:Src/main.c    ****   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+ 160              		.loc 1 366 0
+ 161 002c 0A23     		movs	r3, #10
+ 162 002e E362     		str	r3, [r4, #44]
+ 367:Src/main.c    ****   {
+ 163              		.loc 1 367 0
+ 164 0030 2046     		mov	r0, r4
+ 165 0032 FFF7FEFF 		bl	HAL_SPI_Init
+ 166              	.LVL2:
+ 372:Src/main.c    ****   /* USER CODE END SPI1_Init 2 */
+ 167              		.loc 1 372 0
+ 168 0036 2268     		ldr	r2, [r4]
+ 169 0038 5368     		ldr	r3, [r2, #4]
+ 170 003a 43F04003 		orr	r3, r3, #64
+ 171 003e 5360     		str	r3, [r2, #4]
+ 172 0040 10BD     		pop	{r4, pc}
+ 173              	.L8:
+ 174 0042 00BF     		.align	2
+ 175              	.L7:
+ 176 0044 00000000 		.word	hspi1
+ 177 0048 00300140 		.word	1073819648
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 12
+
+
+ 178              		.cfi_endproc
+ 179              	.LFE66:
+ 181              		.section	.text.MX_USART2_UART_Init,"ax",%progbits
+ 182              		.align	1
+ 183              		.syntax unified
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.fpu softvfp
+ 188              	MX_USART2_UART_Init:
+ 189              	.LFB67:
+ 383:Src/main.c    **** 
+ 190              		.loc 1 383 0
+ 191              		.cfi_startproc
+ 192              		@ args = 0, pretend = 0, frame = 0
+ 193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 194 0000 10B5     		push	{r4, lr}
+ 195              	.LCFI4:
+ 196              		.cfi_def_cfa_offset 8
+ 197              		.cfi_offset 4, -8
+ 198              		.cfi_offset 14, -4
+ 392:Src/main.c    ****   huart2.Init.BaudRate = 31250;
+ 199              		.loc 1 392 0
+ 200 0002 0B4C     		ldr	r4, .L11
+ 201 0004 0B4B     		ldr	r3, .L11+4
+ 202 0006 2360     		str	r3, [r4]
+ 393:Src/main.c    ****   huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 203              		.loc 1 393 0
+ 204 0008 47F61223 		movw	r3, #31250
+ 205 000c 6360     		str	r3, [r4, #4]
+ 394:Src/main.c    ****   huart2.Init.StopBits = UART_STOPBITS_1;
+ 206              		.loc 1 394 0
+ 207 000e 0023     		movs	r3, #0
+ 208 0010 A360     		str	r3, [r4, #8]
+ 395:Src/main.c    ****   huart2.Init.Parity = UART_PARITY_NONE;
+ 209              		.loc 1 395 0
+ 210 0012 E360     		str	r3, [r4, #12]
+ 396:Src/main.c    ****   huart2.Init.Mode = UART_MODE_RX;
+ 211              		.loc 1 396 0
+ 212 0014 2361     		str	r3, [r4, #16]
+ 397:Src/main.c    ****   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 213              		.loc 1 397 0
+ 214 0016 0422     		movs	r2, #4
+ 215 0018 6261     		str	r2, [r4, #20]
+ 398:Src/main.c    ****   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 216              		.loc 1 398 0
+ 217 001a A361     		str	r3, [r4, #24]
+ 399:Src/main.c    ****   if (HAL_UART_Init(&huart2) != HAL_OK)
+ 218              		.loc 1 399 0
+ 219 001c E361     		str	r3, [r4, #28]
+ 400:Src/main.c    ****   {
+ 220              		.loc 1 400 0
+ 221 001e 2046     		mov	r0, r4
+ 222 0020 FFF7FEFF 		bl	HAL_UART_Init
+ 223              	.LVL3:
+ 405:Src/main.c    **** 
+ 224              		.loc 1 405 0
+ 225 0024 2268     		ldr	r2, [r4]
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 13
+
+
+ 226 0026 D368     		ldr	r3, [r2, #12]
+ 227 0028 43F02003 		orr	r3, r3, #32
+ 228 002c D360     		str	r3, [r2, #12]
+ 229 002e 10BD     		pop	{r4, pc}
+ 230              	.L12:
+ 231              		.align	2
+ 232              	.L11:
+ 233 0030 00000000 		.word	huart2
+ 234 0034 00440040 		.word	1073759232
+ 235              		.cfi_endproc
+ 236              	.LFE67:
+ 238              		.section	.text.SystemClock_Config,"ax",%progbits
+ 239              		.align	1
+ 240              		.global	SystemClock_Config
+ 241              		.syntax unified
+ 242              		.thumb
+ 243              		.thumb_func
+ 244              		.fpu softvfp
+ 246              	SystemClock_Config:
+ 247              	.LFB65:
+ 307:Src/main.c    ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 248              		.loc 1 307 0
+ 249              		.cfi_startproc
+ 250              		@ args = 0, pretend = 0, frame = 64
+ 251              		@ frame_needed = 0, uses_anonymous_args = 0
+ 252 0000 30B5     		push	{r4, r5, lr}
+ 253              	.LCFI5:
+ 254              		.cfi_def_cfa_offset 12
+ 255              		.cfi_offset 4, -12
+ 256              		.cfi_offset 5, -8
+ 257              		.cfi_offset 14, -4
+ 258 0002 91B0     		sub	sp, sp, #68
+ 259              	.LCFI6:
+ 260              		.cfi_def_cfa_offset 80
+ 308:Src/main.c    ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 261              		.loc 1 308 0
+ 262 0004 2822     		movs	r2, #40
+ 263 0006 0021     		movs	r1, #0
+ 264 0008 06A8     		add	r0, sp, #24
+ 265 000a FFF7FEFF 		bl	memset
+ 266              	.LVL4:
+ 309:Src/main.c    **** 
+ 267              		.loc 1 309 0
+ 268 000e 0024     		movs	r4, #0
+ 269 0010 0194     		str	r4, [sp, #4]
+ 270 0012 0294     		str	r4, [sp, #8]
+ 271 0014 0394     		str	r4, [sp, #12]
+ 272 0016 0494     		str	r4, [sp, #16]
+ 273 0018 0594     		str	r4, [sp, #20]
+ 313:Src/main.c    ****   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+ 274              		.loc 1 313 0
+ 275 001a 0122     		movs	r2, #1
+ 276 001c 0692     		str	r2, [sp, #24]
+ 314:Src/main.c    ****   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+ 277              		.loc 1 314 0
+ 278 001e 4FF48033 		mov	r3, #65536
+ 279 0022 0793     		str	r3, [sp, #28]
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 14
+
+
+ 316:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 280              		.loc 1 316 0
+ 281 0024 0A92     		str	r2, [sp, #40]
+ 317:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+ 282              		.loc 1 317 0
+ 283 0026 0225     		movs	r5, #2
+ 284 0028 0D95     		str	r5, [sp, #52]
+ 318:Src/main.c    ****   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+ 285              		.loc 1 318 0
+ 286 002a 0E93     		str	r3, [sp, #56]
+ 319:Src/main.c    ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 287              		.loc 1 319 0
+ 288 002c 4FF4E013 		mov	r3, #1835008
+ 289 0030 0F93     		str	r3, [sp, #60]
+ 320:Src/main.c    ****   {
+ 290              		.loc 1 320 0
+ 291 0032 06A8     		add	r0, sp, #24
+ 292 0034 FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 293              	.LVL5:
+ 326:Src/main.c    ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 294              		.loc 1 326 0
+ 295 0038 0F23     		movs	r3, #15
+ 296 003a 0193     		str	r3, [sp, #4]
+ 328:Src/main.c    ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 297              		.loc 1 328 0
+ 298 003c 0295     		str	r5, [sp, #8]
+ 329:Src/main.c    ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 299              		.loc 1 329 0
+ 300 003e 0394     		str	r4, [sp, #12]
+ 330:Src/main.c    ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 301              		.loc 1 330 0
+ 302 0040 4FF48063 		mov	r3, #1024
+ 303 0044 0493     		str	r3, [sp, #16]
+ 331:Src/main.c    **** 
+ 304              		.loc 1 331 0
+ 305 0046 0594     		str	r4, [sp, #20]
+ 333:Src/main.c    ****   {
+ 306              		.loc 1 333 0
+ 307 0048 2946     		mov	r1, r5
+ 308 004a 01A8     		add	r0, sp, #4
+ 309 004c FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 310              	.LVL6:
+ 337:Src/main.c    **** 
+ 311              		.loc 1 337 0
+ 312 0050 11B0     		add	sp, sp, #68
+ 313              	.LCFI7:
+ 314              		.cfi_def_cfa_offset 12
+ 315              		@ sp needed
+ 316 0052 30BD     		pop	{r4, r5, pc}
+ 317              		.cfi_endproc
+ 318              	.LFE65:
+ 320              		.section	.text.main,"ax",%progbits
+ 321              		.align	1
+ 322              		.global	main
+ 323              		.syntax unified
+ 324              		.thumb
+ 325              		.thumb_func
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 15
+
+
+ 326              		.fpu softvfp
+ 328              	main:
+ 329              	.LFB64:
+ 137:Src/main.c    ****   /* USER CODE BEGIN 1 */
+ 330              		.loc 1 137 0
+ 331              		.cfi_startproc
+ 332              		@ args = 0, pretend = 0, frame = 0
+ 333              		@ frame_needed = 0, uses_anonymous_args = 0
+ 334 0000 10B5     		push	{r4, lr}
+ 335              	.LCFI8:
+ 336              		.cfi_def_cfa_offset 8
+ 337              		.cfi_offset 4, -8
+ 338              		.cfi_offset 14, -4
+ 339              	.LVL7:
+ 143:Src/main.c    **** 		keyboardMatrix[i] = 255;
+ 340              		.loc 1 143 0
+ 341 0002 0023     		movs	r3, #0
+ 342 0004 04E0     		b	.L16
+ 343              	.LVL8:
+ 344              	.L17:
+ 144:Src/main.c    **** 	}
+ 345              		.loc 1 144 0 discriminator 3
+ 346 0006 FF21     		movs	r1, #255
+ 347 0008 9E4A     		ldr	r2, .L45
+ 348 000a D154     		strb	r1, [r2, r3]
+ 143:Src/main.c    **** 		keyboardMatrix[i] = 255;
+ 349              		.loc 1 143 0 discriminator 3
+ 350 000c 0133     		adds	r3, r3, #1
+ 351              	.LVL9:
+ 352 000e DBB2     		uxtb	r3, r3
+ 353              	.LVL10:
+ 354              	.L16:
+ 143:Src/main.c    **** 		keyboardMatrix[i] = 255;
+ 355              		.loc 1 143 0 is_stmt 0 discriminator 1
+ 356 0010 072B     		cmp	r3, #7
+ 357 0012 F8D9     		bls	.L17
+ 148:Src/main.c    **** 	ringBuffer.writeIndex = 0;
+ 358              		.loc 1 148 0 is_stmt 1
+ 359 0014 9C4A     		ldr	r2, .L45+4
+ 360 0016 0023     		movs	r3, #0
+ 361              	.LVL11:
+ 362 0018 82F88030 		strb	r3, [r2, #128]
+ 149:Src/main.c    **** 	midiCommand.complete = 0;
+ 363              		.loc 1 149 0
+ 364 001c 82F88130 		strb	r3, [r2, #129]
+ 150:Src/main.c    **** 	midiCommand.dataCounter = 0;
+ 365              		.loc 1 150 0
+ 366 0020 9A4A     		ldr	r2, .L45+8
+ 367 0022 5371     		strb	r3, [r2, #5]
+ 151:Src/main.c    **** 	midiCommand.dataSize = 2;
+ 368              		.loc 1 151 0
+ 369 0024 1371     		strb	r3, [r2, #4]
+ 152:Src/main.c    ****   /* USER CODE END 1 */
+ 370              		.loc 1 152 0
+ 371 0026 0223     		movs	r3, #2
+ 372 0028 D370     		strb	r3, [r2, #3]
+ 159:Src/main.c    **** 
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 16
+
+
+ 373              		.loc 1 159 0
+ 374 002a FFF7FEFF 		bl	HAL_Init
+ 375              	.LVL12:
+ 166:Src/main.c    **** 
+ 376              		.loc 1 166 0
+ 377 002e FFF7FEFF 		bl	SystemClock_Config
+ 378              	.LVL13:
+ 173:Src/main.c    ****   MX_SPI1_Init();
+ 379              		.loc 1 173 0
+ 380 0032 FFF7FEFF 		bl	MX_GPIO_Init
+ 381              	.LVL14:
+ 174:Src/main.c    ****   MX_USART2_UART_Init();
+ 382              		.loc 1 174 0
+ 383 0036 FFF7FEFF 		bl	MX_SPI1_Init
+ 384              	.LVL15:
+ 175:Src/main.c    ****   /* USER CODE BEGIN 2 */
+ 385              		.loc 1 175 0
+ 386 003a FFF7FEFF 		bl	MX_USART2_UART_Init
+ 387              	.LVL16:
+ 179:Src/main.c    ****   __HAL_UART_ENABLE(&huart2);
+ 388              		.loc 1 179 0
+ 389 003e 944B     		ldr	r3, .L45+12
+ 390 0040 1A68     		ldr	r2, [r3]
+ 391 0042 1368     		ldr	r3, [r2]
+ 392 0044 43F04003 		orr	r3, r3, #64
+ 393 0048 1360     		str	r3, [r2]
+ 180:Src/main.c    ****   
+ 394              		.loc 1 180 0
+ 395 004a 924B     		ldr	r3, .L45+16
+ 396 004c 1A68     		ldr	r2, [r3]
+ 397 004e D368     		ldr	r3, [r2, #12]
+ 398 0050 43F40053 		orr	r3, r3, #8192
+ 399 0054 D360     		str	r3, [r2, #12]
+ 400 0056 31E0     		b	.L18
+ 401              	.LVL17:
+ 402              	.L29:
+ 200:Src/main.c    **** 		  {
+ 403              		.loc 1 200 0
+ 404 0058 8B4B     		ldr	r3, .L45+4
+ 405 005a 93F88020 		ldrb	r2, [r3, #128]	@ zero_extendqisi2
+ 406 005e D2B2     		uxtb	r2, r2
+ 407 0060 93F88130 		ldrb	r3, [r3, #129]	@ zero_extendqisi2
+ 408 0064 DBB2     		uxtb	r3, r3
+ 409 0066 9A42     		cmp	r2, r3
+ 410 0068 28D0     		beq	.L18
+ 411              	.LBB13:
+ 412              	.LBB14:
+ 439:Src/main.c    **** 
+ 440:Src/main.c    **** /* USER CODE BEGIN 4 */
+ 441:Src/main.c    **** /* We're only allowing midi notes between 36 and 84 otherwise
+ 442:Src/main.c    ****  * we'll overshoot the keyboard matrix array...
+ 443:Src/main.c    ****  */
+ 444:Src/main.c    **** 
+ 445:Src/main.c    ****  /**
+ 446:Src/main.c    ****   * @brief Set Keyboard Key
+ 447:Src/main.c    ****   * @param uint_8_t MIDInote
+ 448:Src/main.c    ****   * @retval None
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 17
+
+
+ 449:Src/main.c    ****   */
+ 450:Src/main.c    **** 
+ 451:Src/main.c    **** inline void Note_On(uint8_t note)
+ 452:Src/main.c    **** {
+ 453:Src/main.c    **** 
+ 454:Src/main.c    **** 	/**
+ 455:Src/main.c    **** 	 * possibly long winded, but!
+ 456:Src/main.c    **** 	 * Bounds check the note, calculate which zone it's in,
+ 457:Src/main.c    **** 	 * Invert the zone for the keyboard matrix and then
+ 458:Src/main.c    **** 	 * flip the relevant bit.
+ 459:Src/main.c    **** 	 */
+ 460:Src/main.c    **** 
+ 461:Src/main.c    **** 	if ((note > 35) && (note < 85)) {
+ 462:Src/main.c    **** 		rawZone = ((note - 36) / 8);
+ 463:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 464:Src/main.c    **** 		m4kNote = note - 36 - (8 * rawZone);
+ 465:Src/main.c    **** 		keyboardMatrix[m4kZone] &= ~(1 << m4kNote);
+ 466:Src/main.c    **** 	}
+ 467:Src/main.c    **** }
+ 468:Src/main.c    **** 
+ 469:Src/main.c    **** /**
+ 470:Src/main.c    ****  * @brief Set Keyboard Key
+ 471:Src/main.c    ****  * @param uint_8_t MIDInote
+ 472:Src/main.c    ****  * @retval None
+ 473:Src/main.c    ****  */
+ 474:Src/main.c    **** 
+ 475:Src/main.c    **** inline void Note_Off(uint8_t note)
+ 476:Src/main.c    **** {
+ 477:Src/main.c    **** 	if ((note > 35) && (note < 85)) {
+ 478:Src/main.c    **** 		rawZone = ((note - 36) / 8);
+ 479:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 480:Src/main.c    **** 		m4kNote = note - 36 - (8 * rawZone);
+ 481:Src/main.c    **** 		keyboardMatrix[m4kZone] |= (1 << m4kNote);
+ 482:Src/main.c    **** 	}
+ 483:Src/main.c    **** }
+ 484:Src/main.c    **** 
+ 485:Src/main.c    **** inline uint8_t ReadRingBuffer(void)
+ 486:Src/main.c    **** {
+ 487:Src/main.c    **** 	/* Return a byte from the ringbuffer at the current
+ 488:Src/main.c    **** 	 * readIndex. 
+ 489:Src/main.c    **** 	 */
+ 490:Src/main.c    **** 	tempInt = ringBuffer.readIndex;
+ 413              		.loc 1 490 0
+ 414 006a 874B     		ldr	r3, .L45+4
+ 415 006c 93F88010 		ldrb	r1, [r3, #128]	@ zero_extendqisi2
+ 416 0070 C9B2     		uxtb	r1, r1
+ 417 0072 894A     		ldr	r2, .L45+20
+ 418 0074 1170     		strb	r1, [r2]
+ 491:Src/main.c    **** 	ringBuffer.readIndex++;
+ 419              		.loc 1 491 0
+ 420 0076 93F88020 		ldrb	r2, [r3, #128]	@ zero_extendqisi2
+ 421 007a 0132     		adds	r2, r2, #1
+ 422 007c D2B2     		uxtb	r2, r2
+ 423 007e 83F88020 		strb	r2, [r3, #128]
+ 492:Src/main.c    **** 	ringBuffer.readIndex &= 127;
+ 424              		.loc 1 492 0
+ 425 0082 93F88020 		ldrb	r2, [r3, #128]	@ zero_extendqisi2
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 18
+
+
+ 426 0086 02F07F02 		and	r2, r2, #127
+ 427 008a 83F88020 		strb	r2, [r3, #128]
+ 493:Src/main.c    **** 	return ringBuffer.data[tempInt];
+ 428              		.loc 1 493 0
+ 429 008e 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 430 0090 DBB2     		uxtb	r3, r3
+ 431              	.LBE14:
+ 432              	.LBE13:
+ 204:Src/main.c    **** 			  {
+ 433              		.loc 1 204 0
+ 434 0092 13F0800F 		tst	r3, #128
+ 435 0096 2AD1     		bne	.L40
+ 241:Src/main.c    **** 				  midiCommand.dataCounter++;
+ 436              		.loc 1 241 0
+ 437 0098 7C4A     		ldr	r2, .L45+8
+ 438 009a 1179     		ldrb	r1, [r2, #4]	@ zero_extendqisi2
+ 439 009c 1144     		add	r1, r1, r2
+ 440 009e 4B70     		strb	r3, [r1, #1]
+ 242:Src/main.c    **** 			  }
+ 441              		.loc 1 242 0
+ 442 00a0 1379     		ldrb	r3, [r2, #4]	@ zero_extendqisi2
+ 443 00a2 0133     		adds	r3, r3, #1
+ 444 00a4 DBB2     		uxtb	r3, r3
+ 445 00a6 1371     		strb	r3, [r2, #4]
+ 446              	.L28:
+ 244:Src/main.c    **** 				  /* now have a complete command */
+ 447              		.loc 1 244 0
+ 448 00a8 784B     		ldr	r3, .L45+8
+ 449 00aa 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 450 00ac D2B2     		uxtb	r2, r2
+ 451 00ae DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 452 00b0 DBB2     		uxtb	r3, r3
+ 453 00b2 9A42     		cmp	r2, r3
+ 454 00b4 02D3     		bcc	.L18
+ 247:Src/main.c    **** 			  }
+ 455              		.loc 1 247 0
+ 456 00b6 0122     		movs	r2, #1
+ 457 00b8 744B     		ldr	r3, .L45+8
+ 458 00ba 5A71     		strb	r2, [r3, #5]
+ 459              	.L18:
+ 198:Src/main.c    **** 	  {
+ 460              		.loc 1 198 0
+ 461 00bc 734B     		ldr	r3, .L45+8
+ 462 00be 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 463 00c0 002B     		cmp	r3, #0
+ 464 00c2 C9D0     		beq	.L29
+ 254:Src/main.c    **** 		  switch (midiCommand.status)
+ 465              		.loc 1 254 0
+ 466 00c4 714B     		ldr	r3, .L45+8
+ 467 00c6 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 468 00c8 DBB2     		uxtb	r3, r3
+ 469 00ca 012B     		cmp	r3, #1
+ 470 00cc F6D1     		bne	.L18
+ 255:Src/main.c    **** 		  {
+ 471              		.loc 1 255 0
+ 472 00ce 6F4B     		ldr	r3, .L45+8
+ 473 00d0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 19
+
+
+ 474 00d2 DBB2     		uxtb	r3, r3
+ 475 00d4 902B     		cmp	r3, #144
+ 476 00d6 47D0     		beq	.L31
+ 477 00d8 B02B     		cmp	r3, #176
+ 478 00da 00F0BB80 		beq	.L32
+ 479 00de 802B     		cmp	r3, #128
+ 480 00e0 00F09180 		beq	.L41
+ 481              	.L30:
+ 294:Src/main.c    **** 		  midiCommand.dataCounter = 0;
+ 482              		.loc 1 294 0
+ 483 00e4 694B     		ldr	r3, .L45+8
+ 484 00e6 0022     		movs	r2, #0
+ 485 00e8 5A71     		strb	r2, [r3, #5]
+ 295:Src/main.c    **** 	  }
+ 486              		.loc 1 295 0
+ 487 00ea 1A71     		strb	r2, [r3, #4]
+ 488 00ec E6E7     		b	.L18
+ 489              	.L40:
+ 207:Src/main.c    **** 				  case MIDI_ON:
+ 490              		.loc 1 207 0
+ 491 00ee 03F0F003 		and	r3, r3, #240
+ 492 00f2 B02B     		cmp	r3, #176
+ 493 00f4 20D0     		beq	.L22
+ 494 00f6 0BD8     		bhi	.L23
+ 495 00f8 802B     		cmp	r3, #128
+ 496 00fa 15D0     		beq	.L24
+ 497 00fc 902B     		cmp	r3, #144
+ 498 00fe 2BD1     		bne	.L21
+ 209:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 499              		.loc 1 209 0
+ 500 0100 624B     		ldr	r3, .L45+8
+ 501 0102 9022     		movs	r2, #144
+ 502 0104 1A70     		strb	r2, [r3]
+ 210:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 503              		.loc 1 210 0
+ 504 0106 0222     		movs	r2, #2
+ 505 0108 DA70     		strb	r2, [r3, #3]
+ 211:Src/main.c    **** 					  break;
+ 506              		.loc 1 211 0
+ 507 010a 0022     		movs	r2, #0
+ 508 010c 1A71     		strb	r2, [r3, #4]
+ 212:Src/main.c    **** 				  case MIDI_OFF:
+ 509              		.loc 1 212 0
+ 510 010e CBE7     		b	.L28
+ 511              	.L23:
+ 207:Src/main.c    **** 				  case MIDI_ON:
+ 512              		.loc 1 207 0
+ 513 0110 C02B     		cmp	r3, #192
+ 514 0112 19D0     		beq	.L26
+ 515 0114 D02B     		cmp	r3, #208
+ 516 0116 1FD1     		bne	.L21
+ 229:Src/main.c    **** 					  midiCommand.dataSize = 1;
+ 517              		.loc 1 229 0
+ 518 0118 5C4B     		ldr	r3, .L45+8
+ 519 011a C022     		movs	r2, #192
+ 520 011c 1A70     		strb	r2, [r3]
+ 230:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 20
+
+
+ 521              		.loc 1 230 0
+ 522 011e 0122     		movs	r2, #1
+ 523 0120 DA70     		strb	r2, [r3, #3]
+ 231:Src/main.c    **** 					  break;
+ 524              		.loc 1 231 0
+ 525 0122 0022     		movs	r2, #0
+ 526 0124 1A71     		strb	r2, [r3, #4]
+ 232:Src/main.c    **** 				  default:
+ 527              		.loc 1 232 0
+ 528 0126 BFE7     		b	.L28
+ 529              	.L24:
+ 214:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 530              		.loc 1 214 0
+ 531 0128 584B     		ldr	r3, .L45+8
+ 532 012a 8022     		movs	r2, #128
+ 533 012c 1A70     		strb	r2, [r3]
+ 215:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 534              		.loc 1 215 0
+ 535 012e 0222     		movs	r2, #2
+ 536 0130 DA70     		strb	r2, [r3, #3]
+ 216:Src/main.c    **** 					  break;
+ 537              		.loc 1 216 0
+ 538 0132 0022     		movs	r2, #0
+ 539 0134 1A71     		strb	r2, [r3, #4]
+ 217:Src/main.c    **** 				  case MIDI_CONT:
+ 540              		.loc 1 217 0
+ 541 0136 B7E7     		b	.L28
+ 542              	.L22:
+ 219:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 543              		.loc 1 219 0
+ 544 0138 544B     		ldr	r3, .L45+8
+ 545 013a B022     		movs	r2, #176
+ 546 013c 1A70     		strb	r2, [r3]
+ 220:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 547              		.loc 1 220 0
+ 548 013e 0222     		movs	r2, #2
+ 549 0140 DA70     		strb	r2, [r3, #3]
+ 221:Src/main.c    **** 					  break;
+ 550              		.loc 1 221 0
+ 551 0142 0022     		movs	r2, #0
+ 552 0144 1A71     		strb	r2, [r3, #4]
+ 222:Src/main.c    **** 				  case MIDI_PROG:
+ 553              		.loc 1 222 0
+ 554 0146 AFE7     		b	.L28
+ 555              	.L26:
+ 224:Src/main.c    **** 					  midiCommand.dataSize = 1;
+ 556              		.loc 1 224 0
+ 557 0148 504B     		ldr	r3, .L45+8
+ 558 014a C022     		movs	r2, #192
+ 559 014c 1A70     		strb	r2, [r3]
+ 225:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 560              		.loc 1 225 0
+ 561 014e 0122     		movs	r2, #1
+ 562 0150 DA70     		strb	r2, [r3, #3]
+ 226:Src/main.c    **** 					  break;
+ 563              		.loc 1 226 0
+ 564 0152 0022     		movs	r2, #0
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 21
+
+
+ 565 0154 1A71     		strb	r2, [r3, #4]
+ 227:Src/main.c    **** 				  case MIDI_PRES:
+ 566              		.loc 1 227 0
+ 567 0156 A7E7     		b	.L28
+ 568              	.L21:
+ 234:Src/main.c    **** 					  midiCommand.dataSize = 2;
+ 569              		.loc 1 234 0
+ 570 0158 4C4B     		ldr	r3, .L45+8
+ 571 015a FF22     		movs	r2, #255
+ 572 015c 1A70     		strb	r2, [r3]
+ 235:Src/main.c    **** 					  midiCommand.dataCounter = 0;
+ 573              		.loc 1 235 0
+ 574 015e 0222     		movs	r2, #2
+ 575 0160 DA70     		strb	r2, [r3, #3]
+ 236:Src/main.c    **** 				  }
+ 576              		.loc 1 236 0
+ 577 0162 0022     		movs	r2, #0
+ 578 0164 1A71     		strb	r2, [r3, #4]
+ 579 0166 9FE7     		b	.L28
+ 580              	.L31:
+ 259:Src/main.c    **** 				  /* If there's a velocity in the second data byte, it's an on. */
+ 581              		.loc 1 259 0
+ 582 0168 484B     		ldr	r3, .L45+8
+ 583 016a 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 584 016c 2BB3     		cbz	r3, .L34
+ 261:Src/main.c    **** 			  }
+ 585              		.loc 1 261 0
+ 586 016e 474B     		ldr	r3, .L45+8
+ 587 0170 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 588 0172 DBB2     		uxtb	r3, r3
+ 589              	.LVL18:
+ 590              	.LBB15:
+ 591              	.LBB16:
+ 461:Src/main.c    **** 		rawZone = ((note - 36) / 8);
+ 592              		.loc 1 461 0
+ 593 0174 A3F12402 		sub	r2, r3, #36
+ 594 0178 D2B2     		uxtb	r2, r2
+ 595 017a 302A     		cmp	r2, #48
+ 596 017c B2D8     		bhi	.L30
+ 462:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 597              		.loc 1 462 0
+ 598 017e B3F12402 		subs	r2, r3, #36
+ 599 0182 18D4     		bmi	.L42
+ 600              	.L35:
+ 601 0184 C2F3C702 		ubfx	r2, r2, #3, #8
+ 602 0188 4449     		ldr	r1, .L45+24
+ 603 018a 0A70     		strb	r2, [r1]
+ 463:Src/main.c    **** 		m4kNote = note - 36 - (8 * rawZone);
+ 604              		.loc 1 463 0
+ 605 018c C2F10701 		rsb	r1, r2, #7
+ 606 0190 C9B2     		uxtb	r1, r1
+ 607 0192 4348     		ldr	r0, .L45+28
+ 608 0194 0170     		strb	r1, [r0]
+ 464:Src/main.c    **** 		keyboardMatrix[m4kZone] &= ~(1 << m4kNote);
+ 609              		.loc 1 464 0
+ 610 0196 D200     		lsls	r2, r2, #3
+ 611 0198 D2B2     		uxtb	r2, r2
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 22
+
+
+ 612 019a 9B1A     		subs	r3, r3, r2
+ 613              	.LVL19:
+ 614 019c 243B     		subs	r3, r3, #36
+ 615 019e DBB2     		uxtb	r3, r3
+ 616 01a0 404A     		ldr	r2, .L45+32
+ 617 01a2 1370     		strb	r3, [r2]
+ 465:Src/main.c    **** 	}
+ 618              		.loc 1 465 0
+ 619 01a4 374C     		ldr	r4, .L45
+ 620 01a6 625C     		ldrb	r2, [r4, r1]	@ zero_extendqisi2
+ 621 01a8 0120     		movs	r0, #1
+ 622 01aa 00FA03F3 		lsl	r3, r0, r3
+ 623 01ae 22EA0303 		bic	r3, r2, r3
+ 624 01b2 6354     		strb	r3, [r4, r1]
+ 625 01b4 96E7     		b	.L30
+ 626              	.LVL20:
+ 627              	.L42:
+ 462:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 628              		.loc 1 462 0
+ 629 01b6 0732     		adds	r2, r2, #7
+ 630 01b8 E4E7     		b	.L35
+ 631              	.LVL21:
+ 632              	.L34:
+ 633              	.LBE16:
+ 634              	.LBE15:
+ 265:Src/main.c    **** 			  }
+ 635              		.loc 1 265 0
+ 636 01ba 344B     		ldr	r3, .L45+8
+ 637 01bc 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 638 01be DBB2     		uxtb	r3, r3
+ 639              	.LVL22:
+ 640              	.LBB17:
+ 641              	.LBB18:
+ 477:Src/main.c    **** 		rawZone = ((note - 36) / 8);
+ 642              		.loc 1 477 0
+ 643 01c0 A3F12402 		sub	r2, r3, #36
+ 644 01c4 D2B2     		uxtb	r2, r2
+ 645 01c6 302A     		cmp	r2, #48
+ 646 01c8 8CD8     		bhi	.L30
+ 478:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 647              		.loc 1 478 0
+ 648 01ca B3F12402 		subs	r2, r3, #36
+ 649 01ce 18D4     		bmi	.L43
+ 650              	.L36:
+ 651 01d0 C2F3C702 		ubfx	r2, r2, #3, #8
+ 652 01d4 3149     		ldr	r1, .L45+24
+ 653 01d6 0A70     		strb	r2, [r1]
+ 479:Src/main.c    **** 		m4kNote = note - 36 - (8 * rawZone);
+ 654              		.loc 1 479 0
+ 655 01d8 C2F10701 		rsb	r1, r2, #7
+ 656 01dc C9B2     		uxtb	r1, r1
+ 657 01de 3048     		ldr	r0, .L45+28
+ 658 01e0 0170     		strb	r1, [r0]
+ 480:Src/main.c    **** 		keyboardMatrix[m4kZone] |= (1 << m4kNote);
+ 659              		.loc 1 480 0
+ 660 01e2 D200     		lsls	r2, r2, #3
+ 661 01e4 D2B2     		uxtb	r2, r2
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 23
+
+
+ 662 01e6 9B1A     		subs	r3, r3, r2
+ 663              	.LVL23:
+ 664 01e8 243B     		subs	r3, r3, #36
+ 665 01ea DBB2     		uxtb	r3, r3
+ 666 01ec 2D4A     		ldr	r2, .L45+32
+ 667 01ee 1370     		strb	r3, [r2]
+ 481:Src/main.c    **** 	}
+ 668              		.loc 1 481 0
+ 669 01f0 244C     		ldr	r4, .L45
+ 670 01f2 625C     		ldrb	r2, [r4, r1]	@ zero_extendqisi2
+ 671 01f4 0120     		movs	r0, #1
+ 672 01f6 00FA03F3 		lsl	r3, r0, r3
+ 673 01fa 1343     		orrs	r3, r3, r2
+ 674 01fc DBB2     		uxtb	r3, r3
+ 675 01fe 6354     		strb	r3, [r4, r1]
+ 676 0200 70E7     		b	.L30
+ 677              	.LVL24:
+ 678              	.L43:
+ 478:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 679              		.loc 1 478 0
+ 680 0202 0732     		adds	r2, r2, #7
+ 681 0204 E4E7     		b	.L36
+ 682              	.LVL25:
+ 683              	.L41:
+ 684              	.LBE18:
+ 685              	.LBE17:
+ 269:Src/main.c    **** 			  break;
+ 686              		.loc 1 269 0
+ 687 0206 214B     		ldr	r3, .L45+8
+ 688 0208 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 689 020a DBB2     		uxtb	r3, r3
+ 690              	.LVL26:
+ 691              	.LBB19:
+ 692              	.LBB20:
+ 477:Src/main.c    **** 		rawZone = ((note - 36) / 8);
+ 693              		.loc 1 477 0
+ 694 020c A3F12402 		sub	r2, r3, #36
+ 695 0210 D2B2     		uxtb	r2, r2
+ 696 0212 302A     		cmp	r2, #48
+ 697 0214 3FF666AF 		bhi	.L30
+ 478:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 698              		.loc 1 478 0
+ 699 0218 B3F12402 		subs	r2, r3, #36
+ 700 021c 18D4     		bmi	.L44
+ 701              	.L37:
+ 702 021e C2F3C702 		ubfx	r2, r2, #3, #8
+ 703 0222 1E49     		ldr	r1, .L45+24
+ 704 0224 0A70     		strb	r2, [r1]
+ 479:Src/main.c    **** 		m4kNote = note - 36 - (8 * rawZone);
+ 705              		.loc 1 479 0
+ 706 0226 C2F10701 		rsb	r1, r2, #7
+ 707 022a C9B2     		uxtb	r1, r1
+ 708 022c 1C48     		ldr	r0, .L45+28
+ 709 022e 0170     		strb	r1, [r0]
+ 480:Src/main.c    **** 		keyboardMatrix[m4kZone] |= (1 << m4kNote);
+ 710              		.loc 1 480 0
+ 711 0230 D200     		lsls	r2, r2, #3
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 24
+
+
+ 712 0232 D2B2     		uxtb	r2, r2
+ 713 0234 9B1A     		subs	r3, r3, r2
+ 714              	.LVL27:
+ 715 0236 243B     		subs	r3, r3, #36
+ 716 0238 DBB2     		uxtb	r3, r3
+ 717 023a 1A4A     		ldr	r2, .L45+32
+ 718 023c 1370     		strb	r3, [r2]
+ 481:Src/main.c    **** 	}
+ 719              		.loc 1 481 0
+ 720 023e 114C     		ldr	r4, .L45
+ 721 0240 625C     		ldrb	r2, [r4, r1]	@ zero_extendqisi2
+ 722 0242 0120     		movs	r0, #1
+ 723 0244 00FA03F3 		lsl	r3, r0, r3
+ 724 0248 1343     		orrs	r3, r3, r2
+ 725 024a DBB2     		uxtb	r3, r3
+ 726 024c 6354     		strb	r3, [r4, r1]
+ 727 024e 49E7     		b	.L30
+ 728              	.LVL28:
+ 729              	.L44:
+ 478:Src/main.c    **** 		m4kZone = 7 - rawZone;
+ 730              		.loc 1 478 0
+ 731 0250 0732     		adds	r2, r2, #7
+ 732 0252 E4E7     		b	.L37
+ 733              	.LVL29:
+ 734              	.L32:
+ 735              	.LBE20:
+ 736              	.LBE19:
+ 272:Src/main.c    **** 				  /* This catches the sustain pedal MIDI command */
+ 737              		.loc 1 272 0
+ 738 0254 0D4B     		ldr	r3, .L45+8
+ 739 0256 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 740 0258 DBB2     		uxtb	r3, r3
+ 741 025a 402B     		cmp	r3, #64
+ 742 025c 7FF442AF 		bne	.L30
+ 274:Src/main.c    **** 					  /**
+ 743              		.loc 1 274 0
+ 744 0260 0A4B     		ldr	r3, .L45+8
+ 745 0262 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 746 0264 DBB2     		uxtb	r3, r3
+ 747 0266 3F2B     		cmp	r3, #63
+ 748 0268 05D8     		bhi	.L38
+ 278:Src/main.c    **** 				  }
+ 749              		.loc 1 278 0
+ 750 026a 064A     		ldr	r2, .L45
+ 751 026c 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 752 026e 43F04003 		orr	r3, r3, #64
+ 753 0272 1370     		strb	r3, [r2]
+ 754 0274 36E7     		b	.L30
+ 755              	.L38:
+ 285:Src/main.c    **** 				  }
+ 756              		.loc 1 285 0
+ 757 0276 034A     		ldr	r2, .L45
+ 758 0278 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 759 027a 03F0BF03 		and	r3, r3, #191
+ 760 027e 1370     		strb	r3, [r2]
+ 761 0280 30E7     		b	.L30
+ 762              	.L46:
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 25
+
+
+ 763 0282 00BF     		.align	2
+ 764              	.L45:
+ 765 0284 00000000 		.word	keyboardMatrix
+ 766 0288 00000000 		.word	ringBuffer
+ 767 028c 00000000 		.word	midiCommand
+ 768 0290 00000000 		.word	hspi1
+ 769 0294 00000000 		.word	huart2
+ 770 0298 00000000 		.word	tempInt
+ 771 029c 00000000 		.word	rawZone
+ 772 02a0 00000000 		.word	m4kZone
+ 773 02a4 00000000 		.word	m4kNote
+ 774              		.cfi_endproc
+ 775              	.LFE64:
+ 777              		.section	.text.Error_Handler,"ax",%progbits
+ 778              		.align	1
+ 779              		.global	Error_Handler
+ 780              		.syntax unified
+ 781              		.thumb
+ 782              		.thumb_func
+ 783              		.fpu softvfp
+ 785              	Error_Handler:
+ 786              	.LFB72:
+ 494:Src/main.c    **** }
+ 495:Src/main.c    **** 
+ 496:Src/main.c    **** /* USER CODE END 4 */
+ 497:Src/main.c    **** 
+ 498:Src/main.c    **** /**
+ 499:Src/main.c    ****   * @brief  This function is executed in case of error occurrence.
+ 500:Src/main.c    ****   * @retval None
+ 501:Src/main.c    ****   */
+ 502:Src/main.c    **** void Error_Handler(void)
+ 503:Src/main.c    **** {
+ 787              		.loc 1 503 0
+ 788              		.cfi_startproc
+ 789              		@ args = 0, pretend = 0, frame = 0
+ 790              		@ frame_needed = 0, uses_anonymous_args = 0
+ 791              		@ link register save eliminated.
+ 792 0000 7047     		bx	lr
+ 793              		.cfi_endproc
+ 794              	.LFE72:
+ 796              		.comm	midiCommand,6,4
+ 797              		.comm	ringBuffer,130,4
+ 798              		.comm	tempInt,1,1
+ 799              		.comm	rawZone,1,1
+ 800              		.comm	m4kNote,1,1
+ 801              		.comm	m4kZone,1,1
+ 802              		.comm	keyboardMatrix,8,4
+ 803              		.comm	huart2,64,4
+ 804              		.comm	hspi1,88,4
+ 805              		.text
+ 806              	.Letext0:
+ 807              		.file 2 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\arm-no
+ 808              		.file 3 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\arm-no
+ 809              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 810              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 811              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 812              		.file 7 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\arm-no
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 26
+
+
+ 813              		.file 8 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\arm-no
+ 814              		.file 9 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\lib\\g
+ 815              		.file 10 "c:\\program files (x86)\\microsoft visual studio\\2017\\community\\linux\\gcc_arm\\arm-n
+ 816              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 817              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
+ 818              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
+ 819              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 820              		.file 15 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 821              		.file 16 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
+ 822              		.file 17 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 823              		.file 18 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 824              		.file 19 "Inc/utilities.h"
+ARM GAS  C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s 			page 27
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:16     .text.MX_GPIO_Init:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:22     .text.MX_GPIO_Init:00000000 MX_GPIO_Init
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:108    .text.MX_GPIO_Init:00000078 $d
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:113    .text.MX_SPI1_Init:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:119    .text.MX_SPI1_Init:00000000 MX_SPI1_Init
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:176    .text.MX_SPI1_Init:00000044 $d
+                            *COM*:00000058 hspi1
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:182    .text.MX_USART2_UART_Init:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:188    .text.MX_USART2_UART_Init:00000000 MX_USART2_UART_Init
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:233    .text.MX_USART2_UART_Init:00000030 $d
+                            *COM*:00000040 huart2
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:239    .text.SystemClock_Config:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:246    .text.SystemClock_Config:00000000 SystemClock_Config
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:321    .text.main:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:328    .text.main:00000000 main
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:765    .text.main:00000284 $d
+                            *COM*:00000008 keyboardMatrix
+                            *COM*:00000082 ringBuffer
+                            *COM*:00000006 midiCommand
+                            *COM*:00000001 tempInt
+                            *COM*:00000001 rawZone
+                            *COM*:00000001 m4kZone
+                            *COM*:00000001 m4kNote
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:778    .text.Error_Handler:00000000 $t
+C:\Users\djame\AppData\Local\Temp\ccu35DFZ.s:785    .text.Error_Handler:00000000 Error_Handler
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_GPIO_Init
+HAL_SPI_Init
+HAL_UART_Init
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init

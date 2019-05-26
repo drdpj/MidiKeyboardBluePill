@@ -1,5 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
+  * MIDI to Hybrid Music 4000 Converter
+  *
   ******************************************************************************
   * @file           : main.c
   * @brief          : Main program body
@@ -31,24 +33,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  ******************************************************************************
-  5V Tolerant Pins on STM32F103C
-  PB-10
-  PB-11
-  PB-12
-  PB-13
-  PB-14
-  PB-15
-
-  PA-8    
-  PA-9
-  PA-10
-  PA-11
-  PA-12
-  PA-13
-  PA-14
-  PA-15
+ * Pins used: Userport PB0-7 (even pins 6-20) are on GPIOs PB6-13
+ * Userport CB1 (pin 2) -> Clk, GPIO PB3
+ * Userport CB2 (pin 4) -> MOSI, GPIO PB5
+ * MIDI serial in (3.3V) -> GPIO PA3
+ *
+ *
+ */
   
-  */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -86,17 +78,26 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi2;
+SPI_HandleTypeDef hspi1;
 
-UART_HandleTypeDef huart3;
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+/* This is the keyboard matrix */
 volatile uint8_t keyboardMatrix[8];
+
+/* Some variables used to calculate the key */
 uint8_t m4kZone;
 uint8_t m4kNote;
 uint8_t rawZone;
+
+/* A temporary integer - probably gets optimised out! */
+
 uint8_t tempInt;
-/* ring buffer */
+
+/* the ring buffer */
+
 volatile struct rb ringBuffer;
 
 /* midi command struct */
@@ -115,8 +116,8 @@ volatile struct mc midiCommand;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI2_Init(void);
-static void MX_USART3_UART_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 inline void Note_On(uint8_t);
 inline void Note_Off(uint8_t);
@@ -170,12 +171,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI2_Init();
-  MX_USART3_UART_Init();
+  MX_SPI1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  /* enable the SPI and UART - we're not using the HAL functions so need to turn them on */
-  __HAL_SPI_ENABLE(&hspi2);
-  __HAL_UART_ENABLE(&huart3);
+
+  /* enable the SPI and UART - not using the HAL read functions so need to turn them on */
+  __HAL_SPI_ENABLE(&hspi1);
+  __HAL_UART_ENABLE(&huart2);
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -254,9 +257,11 @@ int main(void)
 		  case MIDI_ON:
 
 			  if (midiCommand.data[1] != 0) {
+				  /* If there's a velocity in the second data byte, it's an on. */
 				  Note_On(midiCommand.data[0]);
 			  }
 			  else {
+				  /* No velocity in the second data byte is an off. */
 				  Note_Off(midiCommand.data[0]);
 			  }
 			  break;
@@ -265,6 +270,7 @@ int main(void)
 			  break;
 		  case MIDI_CONT:
 			  if (midiCommand.data[0] == MIDI_PED) {
+				  /* This catches the sustain pedal MIDI command */
 				  if (midiCommand.data[1] < 64) {
 					  /**
 					   * Turn it on
@@ -281,6 +287,7 @@ int main(void)
 			  }
 			  break;
 		  default:
+			  /* If it's not a command we care about, do nothing! */
 			  break;
 		  }
 		  /*reset the command */
@@ -330,80 +337,74 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief SPI2 Initialization Function
+  * @brief SPI1 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_SPI2_Init(void)
+static void MX_SPI1_Init(void)
 {
 
-  /* USER CODE BEGIN SPI2_Init 0 */
+  /* USER CODE BEGIN SPI1_Init 0 */
 
-  /* USER CODE END SPI2_Init 0 */
+  /* USER CODE END SPI1_Init 0 */
 
-  /* USER CODE BEGIN SPI2_Init 1 */
+  /* USER CODE BEGIN SPI1_Init 1 */
 
-  /* USER CODE END SPI2_Init 1 */
-  /* SPI2 parameter configuration*/
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_SLAVE;
-  hspi2.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_SLAVE;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES_RXONLY;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN SPI2_Init 2 */
-
-  /* set up interrupt*/
-  hspi2.Instance->CR2 |= SPI_CR2_RXNEIE;
-
-  /* USER CODE END SPI2_Init 2 */
+  /* USER CODE BEGIN SPI1_Init 2 */
+  hspi1.Instance->CR2 |= SPI_CR2_RXNEIE;
+  /* USER CODE END SPI1_Init 2 */
 
 }
 
 /**
-  * @brief USART3 Initialization Function
+  * @brief USART2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART3_UART_Init(void)
+static void MX_USART2_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART3_Init 0 */
+  /* USER CODE BEGIN USART2_Init 0 */
 
-  /* USER CODE END USART3_Init 0 */
+  /* USER CODE END USART2_Init 0 */
 
-  /* USER CODE BEGIN USART3_Init 1 */
+  /* USER CODE BEGIN USART2_Init 1 */
 
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 31250;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 31250;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART3_Init 2 */
+  /* USER CODE BEGIN USART2_Init 2 */
+  huart2.Instance->CR1 |= USART_CR1_RXNEIE;
 
-  /* set up interrupt */
-  huart3.Instance->CR1 |= USART_CR1_RXNEIE;
-
-
-  /* USER CODE END USART3_Init 2 */
+  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -422,17 +423,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin 
-                          |PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
+                          |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : PB0_Pin PB1_Pin PB2_Pin PB3_Pin 
-                           PB4_Pin PB5_Pin PB6_Pin PB7_Pin */
-  GPIO_InitStruct.Pin = PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin 
-                          |PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin;
+  /*Configure GPIO pins : PB4_Pin PB5_Pin PB6_Pin PB7_Pin 
+                           PB0_Pin PB1_Pin PB2_Pin PB3_Pin */
+  GPIO_InitStruct.Pin = PB4_Pin|PB5_Pin|PB6_Pin|PB7_Pin 
+                          |PB0_Pin|PB1_Pin|PB2_Pin|PB3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -449,6 +450,14 @@ static void MX_GPIO_Init(void)
 
 inline void Note_On(uint8_t note)
 {
+
+	/**
+	 * possibly long winded, but!
+	 * Bounds check the note, calculate which zone it's in,
+	 * Invert the zone for the keyboard matrix and then
+	 * flip the relevant bit.
+	 */
+
 	if ((note > 35) && (note < 85)) {
 		rawZone = ((note - 36) / 8);
 		m4kZone = 7 - rawZone;
@@ -475,6 +484,9 @@ inline void Note_Off(uint8_t note)
 
 inline uint8_t ReadRingBuffer(void)
 {
+	/* Return a byte from the ringbuffer at the current
+	 * readIndex. 
+	 */
 	tempInt = ringBuffer.readIndex;
 	ringBuffer.readIndex++;
 	ringBuffer.readIndex &= 127;

@@ -17,12 +17,3 @@
 
 #include "main.h"
 
-uint8_t rotl (uint8_t i)
-{
-	return (i << 1) | (i >> 7);
-}
-
-uint8_t rotr (uint8_t i)
-{
-	return (i >> 1) | (i << 7);
-}

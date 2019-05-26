@@ -74,8 +74,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern SPI_HandleTypeDef hspi2;
-extern UART_HandleTypeDef huart3;
+extern SPI_HandleTypeDef hspi1;
+extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 extern volatile uint8_t keyboardMatrix[8];
 extern volatile struct rb ringBuffer;
@@ -218,67 +218,67 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles SPI2 global interrupt.
+  * @brief This function handles SPI1 global interrupt.
   */
-void SPI2_IRQHandler(void)
+void SPI1_IRQHandler(void)
 {
-  /* USER CODE BEGIN SPI2_IRQn 0 */
-	if ((__HAL_SPI_GET_FLAG(&hspi2, SPI_FLAG_RXNE)))
+  /* USER CODE BEGIN SPI1_IRQn 0 */
+	if ((__HAL_SPI_GET_FLAG(&hspi1, SPI_FLAG_RXNE)))
 	{
-		volatile uint8_t i = (uint8_t)hspi2.Instance->DR;
+		volatile uint8_t i = (uint8_t)hspi1.Instance->DR;
 
 		switch (i) {
 		case 0b01111111:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[0] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[0] << 6;
 			break;
 		case 0b10111111:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[1] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[1] << 6;
 			break;
 		case 0b11011111:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[2] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[2] << 6;
 			break;
 		case 0b11101111:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[3] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[3] << 6;
 			break;
 		case 0b11110111:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[4] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[4] << 6;
 			break;
 		case 0b11111011:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[5] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[5] << 6;
 			break;
 		case 0b11111101:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[6] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[6] << 6;
 			break;
 		case 0b11111110:
-			GPIOA->ODR = (uint16_t)keyboardMatrix[7] << 4;
+			GPIOB->ODR = (uint16_t)keyboardMatrix[7] << 6;
 			break;
 		default:
-			GPIOA->ODR = 0xFF0;
+			GPIOB->ODR = 0xFF0;
 		}
 	}
-  /* USER CODE END SPI2_IRQn 0 */
-  HAL_SPI_IRQHandler(&hspi2);
-  /* USER CODE BEGIN SPI2_IRQn 1 */
+  /* USER CODE END SPI1_IRQn 0 */
+  HAL_SPI_IRQHandler(&hspi1);
+  /* USER CODE BEGIN SPI1_IRQn 1 */
 
-  /* USER CODE END SPI2_IRQn 1 */
+  /* USER CODE END SPI1_IRQn 1 */
 }
 
 /**
-  * @brief This function handles USART3 global interrupt.
+  * @brief This function handles USART2 global interrupt.
   */
-void USART3_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-  /* USER CODE BEGIN USART3_IRQn 0 */
-	if ((__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE))) {
-		ringBuffer.data[ringBuffer.writeIndex] = (uint8_t)huart3.Instance->DR;
+  /* USER CODE BEGIN USART2_IRQn 0 */
+	if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
+		ringBuffer.data[ringBuffer.writeIndex] = (uint8_t)huart2.Instance->DR;
 		ringBuffer.writeIndex++;
 		ringBuffer.writeIndex &= 127;
 	}
-  /* USER CODE END USART3_IRQn 0 */
-  HAL_UART_IRQHandler(&huart3);
-  /* USER CODE BEGIN USART3_IRQn 1 */
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
 
-  /* USER CODE END USART3_IRQn 1 */
+  /* USER CODE END USART2_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

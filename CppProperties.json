@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "inheritEnvironments": [
+        "gcc-arm"
+      ],
+      "name": "gccarm",
+      "includePath": [
+        "${env.INCLUDE}",
+        "${workspaceRoot}\\**"
+      ],
+      "defines": [
+      ],
+      "intelliSenseMode": "linux-gcc-arm",
+    }
+  ]
+}

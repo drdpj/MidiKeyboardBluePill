@@ -28,13 +28,3 @@ struct rb {
 	volatile uint8_t writeIndex;
 };
 
-
-/**
- * Rotate Left
- */
-uint8_t rotl (uint8_t);
-
-/**
- * Rotate Right
- */
-uint8_t rotr (uint8_t);
