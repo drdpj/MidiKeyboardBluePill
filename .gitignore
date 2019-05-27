@@ -328,3 +328,9 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+#Build
+[Bb]uild/
+
+.gitignore
+.mxproject
