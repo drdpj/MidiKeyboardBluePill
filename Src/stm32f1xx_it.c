@@ -32,9 +32,9 @@
   *
   ******************************************************************************
   */
-  /* USER CODE END Header */
+/* USER CODE END Header */
 
-  /* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
@@ -73,27 +73,27 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi2;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-extern volatile uint8_t keyboardMatrix[8];
+extern volatile uint16_t outputArray[8];
 extern volatile struct rb ringBuffer;
 /* USER CODE END EV */
 
 /******************************************************************************/
-/*           Cortex-M3 Processor Interruption and Exception Handlers          */
+/*           Cortex-M3 Processor Interruption and Exception Handlers          */ 
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
   */
 void NMI_Handler(void)
 {
-    /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-    /* USER CODE END NonMaskableInt_IRQn 0 */
-    /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+  /* USER CODE END NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 
-    /* USER CODE END NonMaskableInt_IRQn 1 */
+  /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
 /**
@@ -101,14 +101,14 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
-    /* USER CODE BEGIN HardFault_IRQn 0 */
+  /* USER CODE BEGIN HardFault_IRQn 0 */
 
-    /* USER CODE END HardFault_IRQn 0 */
-    while (1)
-    {
-        /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-        /* USER CODE END W1_HardFault_IRQn 0 */
-    }
+  /* USER CODE END HardFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+    /* USER CODE END W1_HardFault_IRQn 0 */
+  }
 }
 
 /**
@@ -116,14 +116,14 @@ void HardFault_Handler(void)
   */
 void MemManage_Handler(void)
 {
-    /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
-    /* USER CODE END MemoryManagement_IRQn 0 */
-    while (1)
-    {
-        /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-        /* USER CODE END W1_MemoryManagement_IRQn 0 */
-    }
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+    /* USER CODE END W1_MemoryManagement_IRQn 0 */
+  }
 }
 
 /**
@@ -131,14 +131,14 @@ void MemManage_Handler(void)
   */
 void BusFault_Handler(void)
 {
-    /* USER CODE BEGIN BusFault_IRQn 0 */
+  /* USER CODE BEGIN BusFault_IRQn 0 */
 
-    /* USER CODE END BusFault_IRQn 0 */
-    while (1)
-    {
-        /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-        /* USER CODE END W1_BusFault_IRQn 0 */
-    }
+  /* USER CODE END BusFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
+    /* USER CODE END W1_BusFault_IRQn 0 */
+  }
 }
 
 /**
@@ -146,14 +146,14 @@ void BusFault_Handler(void)
   */
 void UsageFault_Handler(void)
 {
-    /* USER CODE BEGIN UsageFault_IRQn 0 */
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
 
-    /* USER CODE END UsageFault_IRQn 0 */
-    while (1)
-    {
-        /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-        /* USER CODE END W1_UsageFault_IRQn 0 */
-    }
+  /* USER CODE END UsageFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+    /* USER CODE END W1_UsageFault_IRQn 0 */
+  }
 }
 
 /**
@@ -161,12 +161,12 @@ void UsageFault_Handler(void)
   */
 void SVC_Handler(void)
 {
-    /* USER CODE BEGIN SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 0 */
 
-    /* USER CODE END SVCall_IRQn 0 */
-    /* USER CODE BEGIN SVCall_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
 
-    /* USER CODE END SVCall_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 1 */
 }
 
 /**
@@ -174,12 +174,12 @@ void SVC_Handler(void)
   */
 void DebugMon_Handler(void)
 {
-    /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
 
-    /* USER CODE END DebugMonitor_IRQn 0 */
-    /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
-    /* USER CODE END DebugMonitor_IRQn 1 */
+  /* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /**
@@ -187,12 +187,12 @@ void DebugMon_Handler(void)
   */
 void PendSV_Handler(void)
 {
-    /* USER CODE BEGIN PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 0 */
 
-    /* USER CODE END PendSV_IRQn 0 */
-    /* USER CODE BEGIN PendSV_IRQn 1 */
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
 
-    /* USER CODE END PendSV_IRQn 1 */
+  /* USER CODE END PendSV_IRQn 1 */
 }
 
 /**
@@ -200,13 +200,13 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-    /* USER CODE BEGIN SysTick_IRQn 0 */
+  /* USER CODE BEGIN SysTick_IRQn 0 */
 
-    /* USER CODE END SysTick_IRQn 0 */
-    HAL_IncTick();
-    /* USER CODE BEGIN SysTick_IRQn 1 */
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
 
-    /* USER CODE END SysTick_IRQn 1 */
+  /* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
@@ -217,49 +217,51 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles SPI1 global interrupt.
+  * @brief This function handles SPI2 global interrupt.
   */
-void SPI1_IRQHandler(void)
+void SPI2_IRQHandler(void)
 {
-    /* USER CODE BEGIN SPI1_IRQn 0 */
-    if ((__HAL_SPI_GET_FLAG(&hspi1, SPI_FLAG_RXNE)))
+  /* USER CODE BEGIN SPI2_IRQn 0 */
+    if ((__HAL_SPI_GET_FLAG(&hspi2, SPI_FLAG_RXNE)))
     {
-        volatile uint8_t i = (uint8_t)hspi1.Instance->DR;
+        uint8_t i = (uint8_t)hspi2.Instance->DR;
 
         switch (i) {
         case 0b01111111:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[0] << 6;
+            GPIOB->ODR = outputArray[0];
             break;
         case 0b10111111:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[1] << 6;
+            GPIOB->ODR = outputArray[1];
             break;
         case 0b11011111:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[2] << 6;
+            GPIOB->ODR = outputArray[2];
             break;
         case 0b11101111:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[3] << 6;
+            GPIOB->ODR = outputArray[3];
             break;
         case 0b11110111:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[4] << 6;
+            GPIOB->ODR = outputArray[4];
             break;
         case 0b11111011:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[5] << 6;
+            GPIOB->ODR = outputArray[5];
             break;
         case 0b11111101:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[6] << 6;
+            GPIOB->ODR = outputArray[6];
             break;
         case 0b11111110:
-            GPIOB->ODR = (uint16_t)keyboardMatrix[7] << 6;
+            GPIOB->ODR = outputArray[7];
             break;
         default:
-            GPIOB->ODR = 0xFF0;
+            GPIOB->ODR = 0xFFFF;
         }
-    }
-    /* USER CODE END SPI1_IRQn 0 */
-    HAL_SPI_IRQHandler(&hspi1);
-    /* USER CODE BEGIN SPI1_IRQn 1 */
 
-    /* USER CODE END SPI1_IRQn 1 */
+    }
+
+  /* USER CODE END SPI2_IRQn 0 */
+  HAL_SPI_IRQHandler(&hspi2);
+  /* USER CODE BEGIN SPI2_IRQn 1 */
+
+  /* USER CODE END SPI2_IRQn 1 */
 }
 
 /**
@@ -267,17 +269,17 @@ void SPI1_IRQHandler(void)
   */
 void USART2_IRQHandler(void)
 {
-    /* USER CODE BEGIN USART2_IRQn 0 */
+  /* USER CODE BEGIN USART2_IRQn 0 */
     if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
         ringBuffer.data[ringBuffer.writeIndex] = (uint8_t)huart2.Instance->DR;
         ringBuffer.writeIndex++;
         ringBuffer.writeIndex &= 127;
     }
-    /* USER CODE END USART2_IRQn 0 */
-    HAL_UART_IRQHandler(&huart2);
-    /* USER CODE BEGIN USART2_IRQn 1 */
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
 
-    /* USER CODE END USART2_IRQn 1 */
+  /* USER CODE END USART2_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

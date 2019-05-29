@@ -58,22 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define PB4_Pin GPIO_PIN_10
-#define PB4_GPIO_Port GPIOB
-#define PB5_Pin GPIO_PIN_11
-#define PB5_GPIO_Port GPIOB
-#define PB6_Pin GPIO_PIN_12
-#define PB6_GPIO_Port GPIOB
-#define PB7_Pin GPIO_PIN_13
-#define PB7_GPIO_Port GPIOB
-#define PB0_Pin GPIO_PIN_6
-#define PB0_GPIO_Port GPIOB
-#define PB1_Pin GPIO_PIN_7
-#define PB1_GPIO_Port GPIOB
-#define PB2_Pin GPIO_PIN_8
-#define PB2_GPIO_Port GPIOB
-#define PB3_Pin GPIO_PIN_9
-#define PB3_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
