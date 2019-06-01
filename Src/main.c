@@ -38,8 +38,10 @@
   * Userport CB2 (pin 4) -> MOSI, GPIO PB15 (SPI2)
   * MIDI serial in (3.3V) -> GPIO PA3  (USART2)
   *
+  * PA5 - Button (to ground) to program channel,
+  * PA6 - LED (active low) to indicate programming mode
   *
- */
+  */
 
 /* USER CODE END Header */
 
@@ -58,6 +60,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MIDI_CHANNEL_MASK 0b00001111
 #define MIDI_MASK 0b11110000
 #define MIDI_ON 0b10010000
 #define MIDI_OFF 0b10000000
@@ -83,6 +86,11 @@ SPI_HandleTypeDef hspi2;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+/* Set Channel Flag */
+volatile uint8_t setChannel = FALSE;
+volatile uint8_t ignoreChannel = TRUE;
+uint8_t midiChannel = 0;
 
 /* This is the keyboard matrix */
 uint8_t keyboardMatrix[8];
@@ -430,8 +438,24 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(program_led_GPIO_Port, program_led_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_4 
                           |GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_SET);
+
+  /*Configure GPIO pin : program_led_Pin */
+  GPIO_InitStruct.Pin = program_led_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(program_led_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : button_Pin */
+  GPIO_InitStruct.Pin = button_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB10 PB11 PB12 PB4 
                            PB6 PB7 PB8 PB9 */
@@ -441,6 +465,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 
