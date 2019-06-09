@@ -7,3 +7,5 @@ A BluePill board, plus optocoupler circuit is all that is required to get this t
   Userport CB1 (pin 2) -> Clk, GPIO PB13  (SPI2) - add external 10k pullup to 5V
   Userport CB2 (pin 4) -> MOSI, GPIO PB15 (SPI2)
   MIDI serial in (3.3V) -> GPIO PA3  (USART2)
+  PA5 - Button (to ground) to program channel (press once and next note sets the channel, press twice and channel is ignored),
+  PA4 - LED (active low, 560R to 3.3V) to indicate programming mode.
