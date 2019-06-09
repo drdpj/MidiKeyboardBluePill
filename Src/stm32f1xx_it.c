@@ -231,13 +231,14 @@ void EXTI9_5_IRQHandler(void)
         /* One press to set the channel */
         setChannel = TRUE;
         /* Turn on the programming mode LED on pin 6 (active low) */
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
     }
     else {
         /* Two presses to ignore the channel */
         ignoreChannel = TRUE;
+        setChannel = FALSE;
         /* Turn off the programming mode LED on pin 6 (active low) */
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
     }
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
