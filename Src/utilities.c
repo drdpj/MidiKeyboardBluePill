@@ -16,4 +16,26 @@
  */
 
 #include "main.h"
+#define FALSE 0
+#define TRUE 1
 
+extern volatile uint8_t setChannel;
+extern volatile uint8_t ignoreChannel;
+
+void Button_Pushed(void)
+{
+    if (setChannel == FALSE)
+    {
+        /* One press to set the channel */
+        setChannel = TRUE;
+        /* Turn on the programming mode LED on pin 6 (active low) */
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    }
+    else {
+        /* Two presses to ignore the channel */
+        ignoreChannel = TRUE;
+        setChannel = FALSE;
+        /* Turn off the programming mode LED on pin 6 (active low) */
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    }
+}

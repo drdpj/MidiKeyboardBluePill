@@ -18,6 +18,7 @@
 
 #include"main.h"
 
+
  /**
   * Ring buffer struct
   */
@@ -28,3 +29,4 @@ struct rb {
     volatile uint8_t writeIndex;
 };
 
+void Button_Pushed(void);

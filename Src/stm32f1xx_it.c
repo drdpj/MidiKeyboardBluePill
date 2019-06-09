@@ -60,7 +60,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+uint16_t pushCounter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -77,9 +77,6 @@
 extern SPI_HandleTypeDef hspi2;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-extern volatile uint8_t setChannel;
-extern volatile uint8_t ignoreChannel;
-
 extern volatile uint16_t outputArray[8];
 extern volatile struct rb ringBuffer;
 /* USER CODE END EV */
@@ -205,7 +202,17 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_RESET) 
+    {
+        pushCounter++;
+    }
+    else {
+        if (pushCounter > 10)
+        {
+            Button_Pushed();
+        }
+        pushCounter = 0;
+    }
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -219,33 +226,6 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f1xx.s).                    */
 /******************************************************************************/
-
-/**
-  * @brief This function handles EXTI line[9:5] interrupts.
-  */
-void EXTI9_5_IRQHandler(void)
-{
-  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-    if (setChannel == FALSE)
-    {
-        /* One press to set the channel */
-        setChannel = TRUE;
-        /* Turn on the programming mode LED on pin 6 (active low) */
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    }
-    else {
-        /* Two presses to ignore the channel */
-        ignoreChannel = TRUE;
-        setChannel = FALSE;
-        /* Turn off the programming mode LED on pin 6 (active low) */
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    }
-  /* USER CODE END EXTI9_5_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
-  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
-
-  /* USER CODE END EXTI9_5_IRQn 1 */
-}
 
 /**
   * @brief This function handles SPI2 global interrupt.
