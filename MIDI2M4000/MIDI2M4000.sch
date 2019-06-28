@@ -735,17 +735,6 @@ F 3 "" H 1900 5000 50  0001 C CNN
 	1    1900 5000
 	1    0    0    -1  
 $EndComp
-$Comp
-L power:GND #PWR028
-U 1 1 5CF69FD6
-P 3750 5300
-F 0 "#PWR028" H 3750 5050 50  0001 C CNN
-F 1 "GND" H 3755 5127 50  0000 C CNN
-F 2 "" H 3750 5300 50  0001 C CNN
-F 3 "" H 3750 5300 50  0001 C CNN
-	1    3750 5300
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	1900 5000 2050 5000
 Connection ~ 2050 5000
@@ -757,8 +746,6 @@ Connection ~ 2500 5000
 Wire Wire Line
 	2950 5000 3400 5000
 Connection ~ 2950 5000
-Wire Wire Line
-	3750 5300 3400 5300
 Wire Wire Line
 	3400 5300 2950 5300
 Connection ~ 3400 5300
@@ -1322,4 +1309,34 @@ Wire Wire Line
 Connection ~ 2550 5900
 Wire Wire Line
 	2550 5900 2950 5900
+$Comp
+L power:GND #PWR028
+U 1 1 5CF69FD6
+P 4050 5300
+F 0 "#PWR028" H 4050 5050 50  0001 C CNN
+F 1 "GND" H 4055 5127 50  0000 C CNN
+F 2 "" H 4050 5300 50  0001 C CNN
+F 3 "" H 4050 5300 50  0001 C CNN
+	1    4050 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C13
+U 1 1 5D157C71
+P 3850 5150
+F 0 "C13" H 3965 5196 50  0000 L CNN
+F 1 "0.1uF" H 3965 5105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric" H 3888 5000 50  0001 C CNN
+F 3 "~" H 3850 5150 50  0001 C CNN
+	1    3850 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3400 5300 3850 5300
+Wire Wire Line
+	3850 5300 4050 5300
+Connection ~ 3850 5300
+Wire Wire Line
+	3400 5000 3850 5000
+Connection ~ 3400 5000
 $EndSCHEMATC
