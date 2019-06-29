@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name MIDI2M4000)(type KiCad)(uri C:/Users/djame/source/repos/MidiKeyboardBluePill/MIDI2M4000/MIDI2M4000.pretty)(options "")(descr ""))
+)
