@@ -97,7 +97,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory "/Users/daniel/Documents/KiCad/MIDI2M4000/Gerbers/"))
+      (outputdirectory "Gerbers/"))
   )
 
   (net 0 "")
@@ -2995,7 +2995,7 @@
   (segment (start 127.887501 101.520001) (end 127.9675 101.6) (width 0.25) (layer F.Cu) (net 56))
   (segment (start 125.015001 101.520001) (end 127.887501 101.520001) (width 0.25) (layer F.Cu) (net 56))
 
-  (zone (net 2) (net_name GND) (layer F.Cu) (tstamp 5D2F99BC) (hatch edge 0.508)
+  (zone (net 2) (net_name GND) (layer F.Cu) (tstamp 5D2FA57E) (hatch edge 0.508)
     (connect_pads (clearance 0.1))
     (min_thickness 0.1)
     (fill yes (arc_segments 32) (thermal_gap 0.254) (thermal_bridge_width 0.4))
@@ -4509,7 +4509,7 @@
       )
     )
   )
-  (zone (net 2) (net_name GND) (layer B.Cu) (tstamp 5D2F99B9) (hatch edge 0.508)
+  (zone (net 2) (net_name GND) (layer B.Cu) (tstamp 5D2FA57B) (hatch edge 0.508)
     (connect_pads (clearance 0.1))
     (min_thickness 0.1)
     (fill yes (arc_segments 32) (thermal_gap 0.254) (thermal_bridge_width 0.4))
