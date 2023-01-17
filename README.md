@@ -9,3 +9,6 @@ A BluePill board, plus optocoupler circuit is all that is required to get this t
   MIDI serial in (3.3V) -> GPIO PA3  (USART2)
   PA5 - Button (to ground) to program channel (press once and next note sets the channel, press twice and channel is ignored),
   PA4 - LED (active low, 560R to 3.3V) to indicate programming mode.
+
+The circuit provided specifies a particular opto-isolator (which just happened to be the SMT part I had available) - you can use whatever circuit you like that fits with the midi 1.0 spec. I, and others, have had this working fine with a 6N138.
+
