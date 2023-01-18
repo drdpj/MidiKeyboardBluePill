@@ -15,6 +15,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Safe keeping:     if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
+      ringBuffer.data[ringBuffer.writeIndex] = (uint8_t)huart2.Instance->DR;
+      ringBuffer.writeIndex++;
+      ringBuffer.writeIndex &= 255;
+    }
+*/
+
 #include "main.h"
 #define FALSE 0
 #define TRUE 1

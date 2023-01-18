@@ -40,6 +40,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "utilities.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +62,17 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 uint16_t pushCounter = 0;
+/* midi command and state */
+extern uint8_t midiStatus;
+extern uint8_t midiData1;
+extern uint8_t midiData2;
+extern uint8_t state;
+extern uint8_t midiByte;
+
+/* other bits */
+extern volatile uint8_t setChannel;
+extern volatile uint8_t ignoreChannel;
+extern volatile uint8_t midiChannel;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,7 +94,7 @@ extern volatile struct rb ringBuffer;
 /* USER CODE END EV */
 
 /******************************************************************************/
-/*           Cortex-M3 Processor Interruption and Exception Handlers          */ 
+/*           Cortex-M3 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
@@ -268,6 +280,7 @@ void SPI2_IRQHandler(void)
 
     }
 
+
   /* USER CODE END SPI2_IRQn 0 */
   HAL_SPI_IRQHandler(&hspi2);
   /* USER CODE BEGIN SPI2_IRQn 1 */
@@ -281,10 +294,46 @@ void SPI2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-    if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
-        ringBuffer.data[ringBuffer.writeIndex] = (uint8_t)huart2.Instance->DR;
-        ringBuffer.writeIndex++;
-        ringBuffer.writeIndex &= 127;
+if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
+
+midiByte = (uint8_t)huart2.Instance->DR;
+      switch (state) 
+      {
+        case 0:
+        if (midiByte >0x7F && midiByte <0xF0) 
+        {
+          midiStatus = midiByte;
+          state = 1;
+        }
+        if (midiByte == 0xF0) state = 3;
+        break;
+        
+        case 1:
+        if (midiByte <0x80) 
+        {
+          midiData1 = midiByte;
+          if (((midiStatus & MIDI_MASK) == 0xC0) || ((midiStatus & MIDI_MASK) == 0xD0)) 
+          {
+            state = 0;
+          } else state = 2;
+        } else state = 0;       
+        break;
+
+        case 2:
+        if (midiByte < 0x80) midiData2 = midiByte;
+        parseMidi();
+        state = 0;
+        break;
+
+        case 3:
+        if (midiByte == 0xF7) state = 0;
+        if (midiByte >0x7F && midiByte <0xF0) {
+          midiStatus = midiByte;
+          state = 1;
+        }
+        break;
+      }
+
     }
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
@@ -296,4 +345,3 @@ void USART2_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

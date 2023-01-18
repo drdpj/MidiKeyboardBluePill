@@ -42,7 +42,19 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+#define MIDI_CHANNEL_MASK 0b00001111
+#define MIDI_MASK 0b11110000
+#define MIDI_ON 0b10010000
+#define MIDI_OFF 0b10000000
+#define MIDI_CONT 0b10110000
+#define MIDI_PRES 0b11010000
+#define MIDI_PROG 0b11000000
+#define MIDI_SYSCOM 0b11110000
+#define MIDI_IGNORE 255
+#define MIDI_PED 64
+#define PEDAL_ZONE 0
+#define FALSE 0
+#define TRUE 1
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -52,6 +64,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void parseMidi(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -62,6 +75,7 @@ void Error_Handler(void);
 #define program_led_GPIO_Port GPIOA
 #define button_Pin GPIO_PIN_5
 #define button_GPIO_Port GPIOA
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -71,5 +85,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

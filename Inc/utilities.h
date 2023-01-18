@@ -24,7 +24,7 @@
   */
 
 struct rb {
-    volatile uint8_t data[128];
+    volatile uint8_t data[256];
     volatile uint8_t readIndex;
     volatile uint8_t writeIndex;
 };
