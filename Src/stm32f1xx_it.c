@@ -15,7 +15,7 @@
   *                        opensource.org/licenses/BSD-3-Clause
   *
   *  USER CODE segments
-  *  Copyright (C) 2019  Daniel Jameson
+  *  Copyright (C) 2019-2023  Daniel Jameson
   *
   *  This program is free software: you can redistribute it and/or modify
   *  it under the terms of the GNU General Public License as published by
@@ -300,18 +300,23 @@ midiByte = (uint8_t)huart2.Instance->DR;
       switch (state) 
       {
         case 0:
+        /* standard MIDI messages, and we really don't want any of the running stuff */
         if (midiByte >0x7F && midiByte <0xF0) 
         {
           midiStatus = midiByte;
           state = 1;
         }
+        /* if we get a system exclusive message...*/
         if (midiByte == 0xF0) state = 3;
         break;
         
         case 1:
+        /* Data bytes are all < 0x80 */
         if (midiByte <0x80) 
         {
           midiData1 = midiByte;
+
+          /* 0xC0 and 0xD0 statuses are all 1 byte data */
           if (((midiStatus & MIDI_MASK) == 0xC0) || ((midiStatus & MIDI_MASK) == 0xD0)) 
           {
             state = 0;
@@ -326,6 +331,7 @@ midiByte = (uint8_t)huart2.Instance->DR;
         break;
 
         case 3:
+        /* we carry this on until we get an 0xF7 byte to end the sys*/
         if (midiByte == 0xF7) state = 0;
         if (midiByte >0x7F && midiByte <0xF0) {
           midiStatus = midiByte;

@@ -47,11 +47,9 @@ extern "C" {
 #define MIDI_ON 0b10010000
 #define MIDI_OFF 0b10000000
 #define MIDI_CONT 0b10110000
-#define MIDI_PRES 0b11010000
-#define MIDI_PROG 0b11000000
-#define MIDI_SYSCOM 0b11110000
-#define MIDI_IGNORE 255
 #define MIDI_PED 64
+#define MIDI_NOTES_OFF 123
+#define MIDI_SOUND_OFF 120 
 #define PEDAL_ZONE 0
 #define FALSE 0
 #define TRUE 1

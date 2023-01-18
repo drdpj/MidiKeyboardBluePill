@@ -17,7 +17,7 @@
  *                        opensource.org/licenses/BSD-3-Clause
  *
  *  USER CODE segments
- *  Copyright (C) 2019  Daniel Jameson
+ *  Copyright (C) 2019-2023  Daniel Jameson
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "utilities.h"
-#include "stdbool.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,28 +60,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MIDI_CHANNEL_MASK 0b00001111
-#define MIDI_MASK 0b11110000
-#define MIDI_ON 0b10010000
-#define MIDI_OFF 0b10000000
-#define MIDI_CONT 0b10110000
-#define MIDI_PRES 0b11010000
-#define MIDI_PROG 0b11000000
-#define MIDI_SYSCOM 0b11110000
-#define MIDI_IGNORE 255
-#define MIDI_PED 64
-#define PEDAL_ZONE 0
-#define FALSE 0
-#define TRUE 1
-
-/* MIDI states */
-#define STATUS_MESSAGE 1
-#define ONE_DATABYTE 2
-#define TWO_DATABYTE 3
-#define SYS_EX 4
-
-/* Some USART defs - ring buffer etc */
-#define RX_BUFFER_SIZE 256
 
 
 /* USER CODE END PD */
@@ -131,6 +109,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI2_Init(void);
+
 /* USER CODE BEGIN PFP */
 inline void parseMidi(void);
 inline void Note_On(uint8_t);
@@ -141,21 +120,6 @@ inline void Note_Off(uint8_t);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-/*static bool msgrx_circ_buf_is_empty(void) {
-	if(rd_ptr == DMA_WRITE_PTR) {
-		return true;
-	}
-	return false;
-}
-
-static uint8_t msgrx_circ_buf_get(void) {
-	uint8_t c = 0;
-	if(rd_ptr != DMA_WRITE_PTR) {
-		c = dmaRingBuffer[rd_ptr++];
-		rd_ptr &= (RX_BUFFER_SIZE - 1);
-	}
-	return c;
-}*/
 
 /* USER CODE END 0 */
 
@@ -166,7 +130,7 @@ static uint8_t msgrx_circ_buf_get(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  /*uint8_t midiByte = 0;*/
+
   uint8_t i = 0;
 
   /* all keys high to start with */
@@ -175,8 +139,6 @@ int main(void)
     keyboardMatrix[i] = 255;
     outputArray[i] = 0xffff;
   }
-
-
 
   /* USER CODE END 1 */
 
@@ -205,7 +167,6 @@ int main(void)
   /* enable the SPI and UART - not using the HAL read functions so need to turn them on */
   __HAL_SPI_ENABLE(&hspi2);
   __HAL_UART_ENABLE(&huart2);
-  /*HAL_UART_Receive_DMA(huart_cobs, dmaRingBuffer, RX_BUFFER_SIZE);*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -406,12 +367,19 @@ inline void parseMidi()
         Note_Off(midiData1);
         break;
       case MIDI_CONT:
+        /* Handle the pedal */
         if (midiData1 == MIDI_PED)
         {
           if (midiData2 < 64) {
             keyboardMatrix[PEDAL_ZONE] |= (1 << 6);
            } 
            else keyboardMatrix[PEDAL_ZONE] &= ~(1 << 6);
+        }
+        /* Handle the sound off/notes off control commands - everything off! */
+        if (midiData1 == MIDI_SOUND_OFF || midiData1 == MIDI_NOTES_OFF) {
+          for (uint_fast8_t i = 36; i<85; i++) {
+            Note_Off(i);
+          }
         }
         break;
 
