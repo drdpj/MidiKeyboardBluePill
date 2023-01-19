@@ -12,3 +12,5 @@ A BluePill board, plus optocoupler circuit is all that is required to get this t
 
 The circuit provided specifies a particular opto-isolator (which just happened to be the SMT part I had available) - you can use whatever circuit you like that fits with the midi 1.0 spec. I, and others, have had this working fine with a 6N138.
 
+Presently I have a few standalone, fully built and tested units for sale. Get in touch if you're interested.
+![midi2m4k](https://user-images.githubusercontent.com/2575676/213465252-ee0512f1-578f-4770-ad0d-df5117150859.jpg)
