@@ -14,6 +14,7 @@ The circuit provided specifies a particular opto-isolator (which just happened t
 
 If you'd like to update the firmware on a pre-built unit, you'll need an st-link utility. The very cheap £5 ones work fine (e.g. https://www.amazon.co.uk/DAOKAI-Downloader-Programmer-STM8STM32-Programming/dp/B09WVQNFNM), but they need to be used in conjunction with ST-LINK Utility rather than CubeProgrammer. It's available here: https://www.st.com/en/development-tools/stsw-link004.html
 Connect GND to GND, SWCLK to SWCLK, SWDIO to SWDIO. Don't connect ANYTHING to +3.3V. 
+
 <img width="297" alt="image" src="https://user-images.githubusercontent.com/2575676/213863482-8e0c1186-f947-4b91-9c7d-d3f016c662ef.png">
 n.b. This is the "debug" header on the recent boards, pin 1 is the right hand pin of the group of 4 if the text is the right way up.
 
