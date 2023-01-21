@@ -12,7 +12,7 @@ A BluePill board, plus optocoupler circuit is all that is required to get this t
 
 The circuit provided specifies a particular opto-isolator (which just happened to be the SMT part I had available) - you can use whatever circuit you like that fits with the midi 1.0 spec. I, and others, have had this working fine with a 6N138.
 
-If you'd like to update the firmware on a pre-built unit, you'll need an st-link. If you have a nucleo development board, it has an ST-LINK V2 built in, failing that, The very cheap £5 ones work fine (e.g. https://www.amazon.co.uk/DAOKAI-Downloader-Programmer-STM8STM32-Programming/dp/B09WVQNFNM), but they need to be used in conjunction with ST-LINK Utility rather than CubeProgrammer. It's available here: https://www.st.com/en/development-tools/stsw-link004.html
+If you'd like to update the firmware on a pre-built unit, you'll need an st-link. If you have a nucleo development board, it has an ST-LINK V2 built in. Failing that, the very cheap £5 ones work fine (e.g. https://www.amazon.co.uk/DAOKAI-Downloader-Programmer-STM8STM32-Programming/dp/B09WVQNFNM), but they need to be used in conjunction with ST-LINK Utility rather than CubeProgrammer. It's available here: https://www.st.com/en/development-tools/stsw-link004.html
 
 Connect GND to GND, SWCLK to SWCLK, SWDIO to SWDIO. Don't connect ANYTHING to +3.3V. 
 
