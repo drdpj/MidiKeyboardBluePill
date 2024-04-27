@@ -15,7 +15,7 @@
   *                        opensource.org/licenses/BSD-3-Clause
   *
   *  USER CODE segments
-  *  Copyright (C) 2019-2023  Daniel Jameson
+  *  Copyright (C) 2019-2024  Daniel Jameson
   *
   *  This program is free software: you can redistribute it and/or modify
   *  it under the terms of the GNU General Public License as published by
@@ -294,53 +294,91 @@ void SPI2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
+  if ((__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE))) {
 
-midiByte = (uint8_t)huart2.Instance->DR;
-      switch (state) 
-      {
-        case 0:
-        /* standard MIDI messages, and we really don't want any of the running stuff */
-        if (midiByte >0x7F && midiByte <0xF0) 
-        {
-          midiStatus = midiByte;
-          state = 1;
-        }
-        /* if we get a system exclusive message...*/
-        if (midiByte == 0xF0) state = 3;
+    midiByte = (uint8_t)huart2.Instance->DR;
+
+    /**
+     *  States: 0 = do nothing, we've not seen a valid status message
+     *          1 = awaiting first data byte
+     *          2 = awaiting second data byte
+     *          3 = system exclusive
+     * N.B. System exclusive should never break the current MIDI status - we return to that,
+     * so it goes back to the previous state after it ends.
+     */
+
+    /* This is a standard MIDI message, so we're going to wait for a data byte */
+    if (midiByte >0x7F && midiByte <0xF0) 
+    {
+      midiStatus = midiByte;
+      state = 1;
+      return;
+    }
+
+    /* if we get a system exclusive message...*/
+    if (midiByte == 0xF0)
+    {
+      state = 3;
+      return;
+    }
+
+    /* System common messages that can have data are 0xF1, F2, F3 */
+    if (midiByte > 0xF0 && midiByte < 0xF4)
+    {
+      /**
+       * If we see one of these, we're back to doing nothing until we see something
+       * that tells us to do something...
+       */
+      state = 0;
+      return;
+    }
+
+
+    /* Otherwise we're going to do something...*/
+    switch (state) 
+    {
+      /* We don't have a valid command or command we care about */
+      case 0:
         break;
-        
-        case 1:
+      
+      case 1:
         /* Data bytes are all < 0x80 */
-        if (midiByte <0x80) 
+        if (midiByte < 0x80) 
         {
           midiData1 = midiByte;
 
           /* 0xC0 and 0xD0 statuses are all 1 byte data */
           if (((midiStatus & MIDI_MASK) == 0xC0) || ((midiStatus & MIDI_MASK) == 0xD0)) 
           {
-            state = 0;
+            state = 1;
           } else state = 2;
-        } else state = 0;       
+        }      
         break;
 
-        case 2:
-        if (midiByte < 0x80) midiData2 = midiByte;
-        parseMidi();
-        state = 0;
-        break;
-
-        case 3:
-        /* we carry this on until we get an 0xF7 byte to end the sys*/
-        if (midiByte == 0xF7) state = 0;
-        if (midiByte >0x7F && midiByte <0xF0) {
-          midiStatus = midiByte;
+      case 2:
+        /* We're expecting a second data byte here, so again need to check < 0x80 */
+        if (midiByte < 0x80) 
+        {
+          midiData2 = midiByte;
+          /* Second data byte received, parse the status and data */
+          parseMidi();
+          /* go back to waiting for the first byte */
           state = 1;
+
         }
         break;
-      }
+
+      case 3:
+        /* we carry this on until we get an 0xF7 byte to end the sys and return to running mode */
+        if (midiByte == 0xF7) state = 1;
+
+        /* Otherwise we do nothing... */
+        break;
+    
 
     }
+
+  }
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */

@@ -17,7 +17,7 @@
  *                        opensource.org/licenses/BSD-3-Clause
  *
  *  USER CODE segments
- *  Copyright (C) 2019-2023  Daniel Jameson
+ *  Copyright (C) 2019-2024   Daniel Jameson
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -359,6 +359,7 @@ inline void parseMidi()
         }
         else
         {
+          /* Velocity 0 is note off */
           Note_Off(midiData1);
         }
         break;
@@ -366,6 +367,7 @@ inline void parseMidi()
       case MIDI_OFF:
         Note_Off(midiData1);
         break;
+
       case MIDI_CONT:
         /* Handle the pedal */
         if (midiData1 == MIDI_PED)
