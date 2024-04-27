@@ -312,30 +312,30 @@ void USART2_IRQHandler(void)
     {
       midiStatus = midiByte;
       state = 1;
-      return;
-    }
+
+    } 
 
     /* if we get a system exclusive message...*/
-    if (midiByte == 0xF0)
+    else if (midiByte == 0xF0)
     {
       state = 3;
-      return;
+  
     }
 
     /* System common messages that can have data are 0xF1, F2, F3 */
-    if (midiByte > 0xF0 && midiByte < 0xF4)
+    else if (midiByte > 0xF0 && midiByte < 0xF4)
     {
       /**
        * If we see one of these, we're back to doing nothing until we see something
        * that tells us to do something...
        */
       state = 0;
-      return;
+    
     }
 
 
     /* Otherwise we're going to do something...*/
-    switch (state) 
+    else switch (state) 
     {
       /* We don't have a valid command or command we care about */
       case 0:
